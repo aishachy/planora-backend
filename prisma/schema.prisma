@@ -51,9 +51,9 @@ model Event {
   registrations Registration[]
   reviews       Review[]
 
-  @@index([title])
-  @@index([date])
-  @@index([isDeleted])
+  @@index([title], name: "idx_event_title")
+  @@index([date], name: "idx_event_date")
+  @@index([isDeleted], name: "idx_event_isDeleted")
   @@map("events")
 }
 
