@@ -6,6 +6,7 @@ import { eventRouter } from "./modules/event/event.router";
 import { registrationRouter } from "./modules/registration/registration.router";
 import { reviewRouter } from "./modules/review/review.router";
 import { paymentRouter } from "./modules/payment/payment.router";
+import { adminRouter } from "./modules/admin/admin.router";
 
 const app = express();
 
@@ -26,6 +27,8 @@ app.use('/api/event', eventRouter)
 app.use('/api/registration', registrationRouter)
 
 app.use('/api/review', reviewRouter)
+
+app.use('/api/admin', adminRouter)
 
 app.get('/', (req: Request, res: Response) => {
     res.send("Hello, Typescript + Express!!");

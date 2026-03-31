@@ -5,13 +5,13 @@ import bcrypt from "bcrypt";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Seeding started...");
+  console.log("Seeding started...");
 
-  // 🔐 Hash password
+  // Hash password
   const hashedPassword = await bcrypt.hash("123456", 10);
 
   // =========================
-  // 👑 ADMIN
+  // ADMIN
   // =========================
   const adminExists = await prisma.user.findUnique({
     where: { email: "admin@gmail.com" },
@@ -33,7 +33,7 @@ async function main() {
   }
 
   // =========================
-  // 👤 USERS
+  //  USERS
   // =========================
   const users: Awaited<ReturnType<typeof prisma.user.create>>[] = [];
 
@@ -62,7 +62,7 @@ async function main() {
   console.log("✅ Users ready");
 
   // =========================
-  // 🎉 EVENTS
+  // EVENTS
   // =========================
   const events: Awaited<ReturnType<typeof prisma.event.create>>[] = [];
 
@@ -87,7 +87,7 @@ async function main() {
   console.log("✅ Events created");
 
   // =========================
-  // 📝 REGISTRATIONS
+  // REGISTRATIONS
   // =========================
   for (let i = 0; i < events.length; i++) {
     await prisma.registration.create({
