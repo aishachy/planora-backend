@@ -74,15 +74,20 @@ model Registration {
 }
 
 model Payment {
-  id            String        @id @default(uuid())
-  amount        Float
-  status        PaymentStatus @default(PENDING)
-  transactionId String        @unique
-  createdAt     DateTime      @default(now())
+  id                 String        @id @default(uuid())
+  amount             Float
+  transactionId      String        @unique @db.Uuid()
+  stripeEventId      String?       @unique
+  status             PaymentStatus @default(PENDING)
+  paymentGatewayData Json?
+  invoiceUrl         String?
+  createdAt          DateTime      @default(now())
 
   registrationId String       @unique
   registration   Registration @relation(fields: [registrationId], references: [id])
 
+  @@index([registrationId])
+  @@index([transactionId])
   @@map("payments")
 }
 

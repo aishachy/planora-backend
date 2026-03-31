@@ -7,7 +7,7 @@ const bootstrap = () => {
                 console.log(`Server is running on http://localhost:5000`);
         })
     } catch (error) {
-        console.error("Failed to start server"), error
+        console.error("Failed to start server", error)
     }
 }
  bootstrap()
