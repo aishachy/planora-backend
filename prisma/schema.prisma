@@ -30,6 +30,7 @@ model User {
   @@index([email])
   @@index([isDeleted])
   @@map("users")
+  invitations Invitation[]
 }
 
 model Event {
@@ -55,6 +56,7 @@ model Event {
   @@index([date], name: "idx_event_date")
   @@index([isDeleted], name: "idx_event_isDeleted")
   @@map("events")
+  invitations Invitation[]
 }
 
 model Registration {
@@ -107,6 +109,21 @@ model Review {
   @@map("reviews")
 }
 
+model Invitation {
+  id        String   @id @default(uuid())
+  eventId   String
+  userId    String
+  status    InvitationStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+}
+
 enum Role {
   USER
   ADMIN
@@ -123,3 +140,10 @@ enum PaymentStatus {
   COMPLETED
   FAILED
 }
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
