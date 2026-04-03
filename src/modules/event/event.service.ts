@@ -16,7 +16,17 @@ const createEvent = async (data: EventInput) => {
     return await prisma.event.create({
         data,
         include: {
-            organizer: true,
+            organizer: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    isDeleted: true
+                }
+            },
             registrations: true,
             reviews: true,
         },
@@ -27,7 +37,17 @@ const getAllEvents = async () => {
     return await prisma.event.findMany({
         where: { isDeleted: false },
         include: {
-            organizer: true,
+            organizer: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    isDeleted: true
+                }
+            },
             registrations: true,
             reviews: true,
         },
@@ -39,7 +59,17 @@ const getEventById = async (id: string) => {
     const event = await prisma.event.findUnique({
         where: { id },
         include: {
-            organizer: true,
+            organizer: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    isDeleted: true
+                }
+            },
             registrations: true,
             reviews: true,
         },
@@ -55,7 +85,17 @@ const updateEvent = async (id: string, data: Partial<EventInput>) => {
         where: { id },
         data,
         include: {
-            organizer: true,
+            organizer: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    isDeleted: true
+                }
+            },
             registrations: true,
             reviews: true,
         },
@@ -66,10 +106,10 @@ const deleteEvent = async (id: string) => {
     await getEventById(id);
     return await prisma.event.update({
         where: { id },
-        data: { 
+        data: {
             isDeleted: true,
             deletedAt: new Date()
-         },
+        },
     });
 };
 

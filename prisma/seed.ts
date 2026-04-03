@@ -1,4 +1,3 @@
-
 import { PrismaClient } from "@prisma/client/extension";
 import bcrypt from "bcrypt";
 
@@ -23,8 +22,7 @@ async function main() {
         name: "Admin",
         email: "admin@gmail.com",
         password: hashedPassword,
-        role: "ADMIN",
-        phone: "01700000000",
+        role: "ADMIN"
       },
     });
     console.log("✅ Admin created");
@@ -50,8 +48,7 @@ async function main() {
           name: `User ${i}`,
           email,
           password: hashedPassword,
-          role: "USER",
-          phone: `0170000000${i}`,
+          role: "USER"
         },
       });
     }
