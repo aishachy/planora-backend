@@ -1,7 +1,7 @@
 import { prisma } from "../../lib/prisma";
 
 export const ReviewService = {
-  // ✅ Create Review
+  // Create Review
   createReview: async (payload: {
     rating: number;
     comment: string;
@@ -34,25 +34,31 @@ export const ReviewService = {
     return review;
   },
 
-  // ✅ Get all reviews
+  // Get all reviews
   getAllReviews: async () => {
     return prisma.review.findMany({
-      include: {
-        user: true,
-        event: true,
+    include: {
+      user: {
+        select: { id: true, name: true, email: true, role: true, createdAt: true, updatedAt: true },
       },
+      event: {
+        select: { id: true, title: true, date: true, venue: true, fee: true, createdAt: true, updatedAt: true },
+      },
+    },
       orderBy: {
         createdAt: "desc",
       },
     });
   },
 
-  // ✅ Get reviews by event
+  // Get reviews by event
   getReviewsByEvent: async (eventId: string) => {
     return prisma.review.findMany({
       where: { eventId },
       include: {
-        user: true,
+        user: {
+          select: { id: true, name: true, email: true, role: true, createdAt: true, updatedAt: true },
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -60,7 +66,7 @@ export const ReviewService = {
     });
   },
 
-  // ✅ Update review
+  // Update review
   updateReview: async (
     id: string,
     payload: { rating?: number; comment?: string }

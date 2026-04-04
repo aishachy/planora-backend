@@ -67,7 +67,7 @@ model Registration {
   eventId String
   event   Event              @relation(fields: [eventId], references: [id])
 
-  payment          Payment?
+  payment          Payment[] @relation(name: "PaymentsToRegistration")
   registrationDate DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -85,8 +85,8 @@ model Payment {
   invoiceUrl         String?
   createdAt          DateTime      @default(now())
 
-  registrationId String       @unique
-  registration   Registration @relation(fields: [registrationId], references: [id])
+  registrationId String       
+  registration   Registration @relation(fields: [registrationId], references: [id], name: "PaymentsToRegistration")
 
   @@index([registrationId])
   @@index([transactionId])

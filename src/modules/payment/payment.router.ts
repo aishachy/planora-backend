@@ -4,6 +4,10 @@ import { PaymentController } from "./payment.controller";
 
 const router = Router();
 
+// Create a checkout session
+router.post("/create-checkout-session", express.json(), PaymentController.createCheckoutSession);
+
+// Stripe webhook endpoint (raw body required)
 router.post(
   "/webhook",
   express.raw({ type: "application/json" }),

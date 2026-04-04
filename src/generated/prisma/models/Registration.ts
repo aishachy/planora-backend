@@ -192,7 +192,7 @@ export type RegistrationWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Registration"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   event?: Prisma.XOR<Prisma.EventScalarRelationFilter, Prisma.EventWhereInput>
-  payment?: Prisma.XOR<Prisma.PaymentNullableScalarRelationFilter, Prisma.PaymentWhereInput> | null
+  payment?: Prisma.PaymentListRelationFilter
 }
 
 export type RegistrationOrderByWithRelationInput = {
@@ -204,7 +204,7 @@ export type RegistrationOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   event?: Prisma.EventOrderByWithRelationInput
-  payment?: Prisma.PaymentOrderByWithRelationInput
+  payment?: Prisma.PaymentOrderByRelationAggregateInput
 }
 
 export type RegistrationWhereUniqueInput = Prisma.AtLeast<{
@@ -220,7 +220,7 @@ export type RegistrationWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Registration"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   event?: Prisma.XOR<Prisma.EventScalarRelationFilter, Prisma.EventWhereInput>
-  payment?: Prisma.XOR<Prisma.PaymentNullableScalarRelationFilter, Prisma.PaymentWhereInput> | null
+  payment?: Prisma.PaymentListRelationFilter
 }, "id" | "userId_eventId">
 
 export type RegistrationOrderByWithAggregationInput = {
@@ -254,7 +254,7 @@ export type RegistrationCreateInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutRegistrationsInput
   event: Prisma.EventCreateNestedOneWithoutRegistrationsInput
-  payment?: Prisma.PaymentCreateNestedOneWithoutRegistrationInput
+  payment?: Prisma.PaymentCreateNestedManyWithoutRegistrationInput
 }
 
 export type RegistrationUncheckedCreateInput = {
@@ -264,7 +264,7 @@ export type RegistrationUncheckedCreateInput = {
   eventId: string
   registrationDate?: Date | string
   updatedAt?: Date | string
-  payment?: Prisma.PaymentUncheckedCreateNestedOneWithoutRegistrationInput
+  payment?: Prisma.PaymentUncheckedCreateNestedManyWithoutRegistrationInput
 }
 
 export type RegistrationUpdateInput = {
@@ -274,7 +274,7 @@ export type RegistrationUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutRegistrationsNestedInput
   event?: Prisma.EventUpdateOneRequiredWithoutRegistrationsNestedInput
-  payment?: Prisma.PaymentUpdateOneWithoutRegistrationNestedInput
+  payment?: Prisma.PaymentUpdateManyWithoutRegistrationNestedInput
 }
 
 export type RegistrationUncheckedUpdateInput = {
@@ -284,7 +284,7 @@ export type RegistrationUncheckedUpdateInput = {
   eventId?: Prisma.StringFieldUpdateOperationsInput | string
   registrationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  payment?: Prisma.PaymentUncheckedUpdateOneWithoutRegistrationNestedInput
+  payment?: Prisma.PaymentUncheckedUpdateManyWithoutRegistrationNestedInput
 }
 
 export type RegistrationCreateManyInput = {
@@ -467,7 +467,7 @@ export type RegistrationCreateWithoutUserInput = {
   registrationDate?: Date | string
   updatedAt?: Date | string
   event: Prisma.EventCreateNestedOneWithoutRegistrationsInput
-  payment?: Prisma.PaymentCreateNestedOneWithoutRegistrationInput
+  payment?: Prisma.PaymentCreateNestedManyWithoutRegistrationInput
 }
 
 export type RegistrationUncheckedCreateWithoutUserInput = {
@@ -476,7 +476,7 @@ export type RegistrationUncheckedCreateWithoutUserInput = {
   eventId: string
   registrationDate?: Date | string
   updatedAt?: Date | string
-  payment?: Prisma.PaymentUncheckedCreateNestedOneWithoutRegistrationInput
+  payment?: Prisma.PaymentUncheckedCreateNestedManyWithoutRegistrationInput
 }
 
 export type RegistrationCreateOrConnectWithoutUserInput = {
@@ -523,7 +523,7 @@ export type RegistrationCreateWithoutEventInput = {
   registrationDate?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutRegistrationsInput
-  payment?: Prisma.PaymentCreateNestedOneWithoutRegistrationInput
+  payment?: Prisma.PaymentCreateNestedManyWithoutRegistrationInput
 }
 
 export type RegistrationUncheckedCreateWithoutEventInput = {
@@ -532,7 +532,7 @@ export type RegistrationUncheckedCreateWithoutEventInput = {
   userId: string
   registrationDate?: Date | string
   updatedAt?: Date | string
-  payment?: Prisma.PaymentUncheckedCreateNestedOneWithoutRegistrationInput
+  payment?: Prisma.PaymentUncheckedCreateNestedManyWithoutRegistrationInput
 }
 
 export type RegistrationCreateOrConnectWithoutEventInput = {
@@ -627,7 +627,7 @@ export type RegistrationUpdateWithoutUserInput = {
   registrationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   event?: Prisma.EventUpdateOneRequiredWithoutRegistrationsNestedInput
-  payment?: Prisma.PaymentUpdateOneWithoutRegistrationNestedInput
+  payment?: Prisma.PaymentUpdateManyWithoutRegistrationNestedInput
 }
 
 export type RegistrationUncheckedUpdateWithoutUserInput = {
@@ -636,7 +636,7 @@ export type RegistrationUncheckedUpdateWithoutUserInput = {
   eventId?: Prisma.StringFieldUpdateOperationsInput | string
   registrationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  payment?: Prisma.PaymentUncheckedUpdateOneWithoutRegistrationNestedInput
+  payment?: Prisma.PaymentUncheckedUpdateManyWithoutRegistrationNestedInput
 }
 
 export type RegistrationUncheckedUpdateManyWithoutUserInput = {
@@ -661,7 +661,7 @@ export type RegistrationUpdateWithoutEventInput = {
   registrationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutRegistrationsNestedInput
-  payment?: Prisma.PaymentUpdateOneWithoutRegistrationNestedInput
+  payment?: Prisma.PaymentUpdateManyWithoutRegistrationNestedInput
 }
 
 export type RegistrationUncheckedUpdateWithoutEventInput = {
@@ -670,7 +670,7 @@ export type RegistrationUncheckedUpdateWithoutEventInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   registrationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  payment?: Prisma.PaymentUncheckedUpdateOneWithoutRegistrationNestedInput
+  payment?: Prisma.PaymentUncheckedUpdateManyWithoutRegistrationNestedInput
 }
 
 export type RegistrationUncheckedUpdateManyWithoutEventInput = {
@@ -681,6 +681,35 @@ export type RegistrationUncheckedUpdateManyWithoutEventInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type RegistrationCountOutputType
+ */
+
+export type RegistrationCountOutputType = {
+  payment: number
+}
+
+export type RegistrationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  payment?: boolean | RegistrationCountOutputTypeCountPaymentArgs
+}
+
+/**
+ * RegistrationCountOutputType without action
+ */
+export type RegistrationCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RegistrationCountOutputType
+   */
+  select?: Prisma.RegistrationCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * RegistrationCountOutputType without action
+ */
+export type RegistrationCountOutputTypeCountPaymentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentWhereInput
+}
 
 
 export type RegistrationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -693,6 +722,7 @@ export type RegistrationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   event?: boolean | Prisma.EventDefaultArgs<ExtArgs>
   payment?: boolean | Prisma.Registration$paymentArgs<ExtArgs>
+  _count?: boolean | Prisma.RegistrationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["registration"]>
 
 export type RegistrationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -731,6 +761,7 @@ export type RegistrationInclude<ExtArgs extends runtime.Types.Extensions.Interna
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   event?: boolean | Prisma.EventDefaultArgs<ExtArgs>
   payment?: boolean | Prisma.Registration$paymentArgs<ExtArgs>
+  _count?: boolean | Prisma.RegistrationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RegistrationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -746,7 +777,7 @@ export type $RegistrationPayload<ExtArgs extends runtime.Types.Extensions.Intern
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     event: Prisma.$EventPayload<ExtArgs>
-    payment: Prisma.$PaymentPayload<ExtArgs> | null
+    payment: Prisma.$PaymentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1151,7 +1182,7 @@ export interface Prisma__RegistrationClient<T, Null = never, ExtArgs extends run
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   event<T extends Prisma.EventDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EventDefaultArgs<ExtArgs>>): Prisma.Prisma__EventClient<runtime.Types.Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  payment<T extends Prisma.Registration$paymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Registration$paymentArgs<ExtArgs>>): Prisma.Prisma__PaymentClient<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  payment<T extends Prisma.Registration$paymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Registration$paymentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1604,6 +1635,11 @@ export type Registration$paymentArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   include?: Prisma.PaymentInclude<ExtArgs> | null
   where?: Prisma.PaymentWhereInput
+  orderBy?: Prisma.PaymentOrderByWithRelationInput | Prisma.PaymentOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentScalarFieldEnum | Prisma.PaymentScalarFieldEnum[]
 }
 
 /**
