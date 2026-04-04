@@ -50,7 +50,7 @@ export const PaymentService = {
             where: { id: paymentId },
             data: {
               status:
-                session.payment_status === "completed"
+                session.payment_status === "paid"
                   ? PaymentStatus.COMPLETED
                   : PaymentStatus.FAILED,
               stripeEventId: event.id,

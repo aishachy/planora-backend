@@ -3,10 +3,11 @@ import { authRouter } from "./modules/auth/auth.router";
 import cookieParser from "cookie-parser";
 import { userRouter } from "./modules/user/user.router";
 import { eventRouter } from "./modules/event/event.router";
-import { registrationRouter } from "./modules/registration/registration.router";
 import { reviewRouter } from "./modules/review/review.router";
 import { paymentRouter } from "./modules/payment/payment.router";
 import { adminRouter } from "./modules/admin/admin.router";
+import { registrationRouter } from "./modules/registration/registration.router";
+
 
 const app = express();
 

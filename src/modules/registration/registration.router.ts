@@ -1,14 +1,29 @@
 import { Router } from "express";
-import { registrationController } from "./registration.controller";
-
+import {
+  registerToEvent,
+  getAllRegistrations,
+  getMyRegistrations,
+  approveRegistration,
+  rejectRegistration,
+  deleteRegistration,
+} from "./registration.controller";
 
 const router = Router();
 
-router.post("/", registrationController.registerToEvent);
-router.get("/me", registrationController.getMyRegistrations);
-router.get("/", registrationController.getAllRegistrations);
-router.patch("/approve/:id", registrationController.approveRegistration);
-router.patch("/reject/:id", registrationController.rejectRegistration);
-router.delete("/:id", registrationController.deleteRegistration);
+// Register for an event
+router.post("/", registerToEvent);
+
+// Get all registrations (admin)
+router.get("/", getAllRegistrations);
+
+// Get a user's registrations
+router.get("/user/:userId", getMyRegistrations);
+
+// Approve / Reject registrations
+router.patch("/approve/:id", approveRegistration);
+router.patch("/reject/:id", rejectRegistration);
+
+// Delete a registration
+router.delete("/:id", deleteRegistration);
 
 export const registrationRouter = router;

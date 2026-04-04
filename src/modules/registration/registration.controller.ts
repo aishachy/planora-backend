@@ -1,131 +1,80 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
 import { registrationService } from "./registration.service";
+import { RegistrationStatus } from "../../generated/prisma/enums";
 
-// Register to event
-const registerToEvent = async (req: Request, res: Response) => {
-    try {
-        const userId = req.user!.id;
-        const { eventId } = req.body;
+// Register to an event
+export const registerToEvent = async (req: Request, res: Response) => {
+  try {
+    const { userId, eventId, status } = req.body;
+    if (!userId || !eventId) return res.status(400).json({ success: false, message: "Missing userId or eventId" });
 
-        const result = await registrationService.registerToEvent(userId, eventId);
+    const registration = await registrationService.registerToEvent(
+      userId,
+      eventId,
+      status as RegistrationStatus
+    );
 
-        res.status(201).json({
-            success: true,
-            message: "Registered to event successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Event registration failed",
-        });
-    }
+    res.status(201).json({ success: true, data: registration });
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.message });
+  }
 };
 
-//  Get all registrations (ADMIN)
-const getAllRegistrations = async (_req: Request, res: Response) => {
-    try {
-        const result = await registrationService.getAllRegistrations();
-
-        res.status(200).json({
-            success: true,
-            message: "Registrations retrieved successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Registrations retrieval failed",
-        });
-    }
+// Get all registrations
+export const getAllRegistrations = async (_req: Request, res: Response) => {
+  try {
+    const registrations = await registrationService.getAllRegistrations();
+    res.status(200).json({ success: true, data: registrations });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
-//  Get my registrations
-const getMyRegistrations = async (req: Request, res: Response) => {
-    try {
-        const userId = req.user!.id;
-
-        const result = await registrationService.getMyRegistrations(userId);
-
-        res.status(200).json({
-            success: true,
-            message: "My registrations retrieved successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Registrations retrieval failed",
-        });
-    }
+// Get registrations for a user
+export const getMyRegistrations = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const id = Array.isArray(userId) ? userId[0] : userId;
+    const registrations = await registrationService.getMyRegistrations(id);
+    res.status(200).json({ success: true, data: registrations });
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.message });
+  }
 };
 
 // Approve registration
-const approveRegistration = async (req: Request, res: Response) => {
-    try {
-        const id = String(req.params.id);
-
-        const result = await registrationService.approveRegistration(id);
-
-        res.status(200).json({
-            success: true,
-            message: "Registration approved successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Registration approval failed",
-        });
-    }
+export const approveRegistration = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const registrationId = Array.isArray(id) ? id[0] : id;
+    const updated = await registrationService.approveRegistration(registrationId);
+    res.status(200).json({ success: true, data: updated });
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.message });
+  }
 };
 
-//  Reject registration
-const rejectRegistration = async (req: Request, res: Response) => {
-    try {
-        const id = String(req.params.id);
-
-        const result = await registrationService.rejectRegistration(id);
-
-        res.status(200).json({
-            success: true,
-            message: "Registration rejected successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Registration rejection failed",
-        });
-    }
+// Reject registration
+export const rejectRegistration = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const registrationId = Array.isArray(id) ? id[0] : id;
+    const updated = await registrationService.rejectRegistration(registrationId);
+    res.status(200).json({ success: true, data: updated });
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.message });
+  }
 };
 
-//  Delete registration
-const deleteRegistration = async (req: Request, res: Response) => {
-    try {
-        const id = String(req.params.id);
-
-        const result = await registrationService.deleteRegistration(id);
-
-        res.status(200).json({
-            success: true,
-            message: "Registration deleted successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Registration deletion failed",
-        });
-    }
-};
-
-export const registrationController = {
-    registerToEvent,
-    getAllRegistrations,
-    getMyRegistrations,
-    approveRegistration,
-    rejectRegistration,
-    deleteRegistration,
+// Delete registration
+export const deleteRegistration = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const registrationId = Array.isArray(id) ? id[0] : id;
+    const deleted = await registrationService.deleteRegistration(registrationId);
+    res.status(200).json({ success: true, data: deleted });
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.message });
+  }
 };
