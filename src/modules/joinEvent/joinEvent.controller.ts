@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
-import { joinEventService } from "./joinEvent.service";
+import { joinEventService } from "./joinEvent.service.js";
 
 const joinEvent = async (req: Request, res: Response) => {
   try {

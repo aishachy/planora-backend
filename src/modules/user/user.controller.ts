@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
-import { userService } from "./user.service";
+import { userService } from "./user.service.js";
 
 const createUser = async (req: Request, res: Response) => {
     try {

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
-import { registrationService } from "./registration.service";
-import { RegistrationStatus } from "../../generated/prisma/enums";
+import { registrationService } from "./registration.service.js";
+import { RegistrationStatus } from "../../generated/prisma/enums.js";
 
 // Register to an event
 export const registerToEvent = async (req: Request, res: Response) => {

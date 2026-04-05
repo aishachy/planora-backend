@@ -1,8 +1,8 @@
 import express from "express";
-import { authController } from "./auth.controller";
-import auth from "../../middleware/auth";
+import { authController } from "./auth.controller.js";
+import auth from "../../middleware/auth.js";
 
-const router = express.Router()
+const router = express.Router();
 
 router.post('/login', authController.loginUser)
 

@@ -1,7 +1,7 @@
 {
   "name": "planora-backend-project",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "api/index.js",
   "scripts": {
     "start": "node dist/server.js",
     "build": "tsc",
@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "description": "",
-  "type": "commonjs",
+  "type": "module",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/bcrypt": "^6.0.0",

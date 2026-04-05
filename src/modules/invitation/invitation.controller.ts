@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
-import { invitationService } from "./invitation.service";
+import { invitationService } from "./invitation.service.js";
 
 const sendInvitation = async (req: Request, res: Response) => {
   try {

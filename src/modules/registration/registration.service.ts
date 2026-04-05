@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { prisma } from "../../app/lib/prisma";
-import { RegistrationStatus } from "../../generated/prisma/enums";
+import { prisma } from "../../app/lib/prisma.js";
+import { RegistrationStatus } from "../../generated/prisma/enums.js";
 
 // Register to event
 const registerToEvent = async (userId: string, eventId: string, status?: RegistrationStatus) => {

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Stripe from "stripe";
-import { prisma } from "../../lib/prisma";
-import { PaymentStatus } from "../../generated/prisma/enums";
-import { uploadFileToCloudinary } from "../../app/config/cloudinary.config";
-import { sendEmail } from "../../utils/email";
-import { generateInvoicePdf } from "../../utils/payment";
+import { prisma } from "../../lib/prisma.js";
+import { PaymentStatus } from "../../generated/prisma/enums.js";
+import { uploadFileToCloudinary } from "../../app/config/cloudinary.config.js";
+import { sendEmail } from "../../utils/email.js";
+import { generateInvoicePdf } from "../../utils/payment.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2026-03-25.dahlia",
@@ -74,7 +74,7 @@ handlerStripeWebhookEvent: async (event: Stripe.Event) => {
 
       let pdfBuffer: Buffer | null = null;
 
-      const result = await prisma.$transaction(async (tx) => {
+      const result = await prisma.$transaction(async (tx: { payment: { update: (arg0: { where: { id: any; } | { id: any; }; data: { status: "COMPLETED" | "FAILED"; stripeEventId: string; paymentGatewayData: any; } | { invoiceUrl: string; }; }) => any; }; }) => {
         const updatedPayment = await tx.payment.update({
           where: { id: paymentId },
           data: {

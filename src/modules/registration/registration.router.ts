@@ -6,7 +6,7 @@ import {
   approveRegistration,
   rejectRegistration,
   deleteRegistration,
-} from "./registration.controller";
+} from "./registration.controller.js";
 
 const router = Router();
 

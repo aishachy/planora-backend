@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
 import status from "http-status";
-import { PaymentService } from "./payment.service";
-import { envVars } from "../../app/config/env";
-import { catchAsync } from "../../app/shared/catchAsync";
-import { sendResponse } from "../../app/shared/sendResponse";
-import { stripe } from "../../app/config/stripe.config";
+import { PaymentService } from "./payment.service.js";
+import { envVars } from "../../app/config/env.js";
+import { catchAsync } from "../../app/shared/catchAsync.js";
+import { sendResponse } from "../../app/shared/sendResponse.js";
+import { stripe } from "../../app/config/stripe.config.js";
 import { v4 as uuidv4 } from "uuid";
 
 // Create Stripe checkout session

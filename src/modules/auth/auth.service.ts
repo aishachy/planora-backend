@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import bcrypt from "bcrypt";
-import generateToken from "../../utils/jwt";
-import { prisma } from "../../app/lib/prisma";
+import generateToken from "../../utils/jwt.js";
+import { prisma } from "../../app/lib/prisma.js";
 
 
 

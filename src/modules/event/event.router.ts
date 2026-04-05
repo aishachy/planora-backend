@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { eventController } from "./event.controller";
-import auth from "../../middleware/auth";
+import { eventController } from "./event.controller.js";
+import auth from "../../middleware/auth.js";
 
 const router = Router();
 

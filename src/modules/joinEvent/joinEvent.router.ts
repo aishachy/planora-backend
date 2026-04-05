@@ -1,7 +1,7 @@
 import { Router } from "express";
 
-import { joinEventController } from "./joinEvent.controller";
-import auth from "../../middleware/auth";
+import { joinEventController } from "./joinEvent.controller.js";
+import auth from "../../middleware/auth.js";
 
 const router = Router();
 

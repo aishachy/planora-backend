@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
-import { adminService } from "./admin.service";
+import { adminService } from "./admin.service.js";
 
 // USERS
 const getAllUsers = async (_req: Request, res: Response) => {
