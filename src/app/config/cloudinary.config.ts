@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
 import status from "http-status";
-import { envVars } from "./env";
-import AppError from "../../utils/appError";
+import { envVars } from "./env.js";
+import AppError from "../../utils/appError.js";
 
 // ✅ Configure Cloudinary
 cloudinary.config({
