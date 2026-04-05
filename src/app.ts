@@ -1,12 +1,12 @@
 import express, { Request, Response } from "express"
-import { authRouter } from "./modules/auth/auth.router";
+import { authRouter } from "./modules/auth/auth.router.js";
 import cookieParser from "cookie-parser";
-import { userRouter } from "./modules/user/user.router";
-import { eventRouter } from "./modules/event/event.router";
-import { reviewRouter } from "./modules/review/review.router";
-import { paymentRouter } from "./modules/payment/payment.router";
-import { adminRouter } from "./modules/admin/admin.router";
-import { registrationRouter } from "./modules/registration/registration.router";
+import { userRouter } from "./modules/user/user.router.js";
+import { eventRouter } from "./modules/event/event.router.js";
+import { reviewRouter } from "./modules/review/review.router.js";
+import { paymentRouter } from "./modules/payment/payment.router.js";
+import { adminRouter } from "./modules/admin/admin.router.js";
+import { registrationRouter } from "./modules/registration/registration.router.js";
 
 
 const app = express();
