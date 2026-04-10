@@ -22,15 +22,17 @@ model User {
   updatedAt DateTime  @updatedAt
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
+  isBanned  Boolean   @default(false)
+  bannedAt  DateTime?
 
   events        Event[]
   registrations Registration[]
   reviews       Review[]
+  invitations   Invitation[]
 
   @@index([email])
   @@index([isDeleted])
   @@map("users")
-  invitations Invitation[]
 }
 
 model Event {
@@ -51,12 +53,12 @@ model Event {
   organizerId   String?
   registrations Registration[]
   reviews       Review[]
+  invitations   Invitation[]
 
   @@index([title], name: "idx_event_title")
   @@index([date], name: "idx_event_date")
   @@index([isDeleted], name: "idx_event_isDeleted")
   @@map("events")
-  invitations Invitation[]
 }
 
 model Registration {
@@ -68,8 +70,8 @@ model Registration {
   event   Event              @relation(fields: [eventId], references: [id])
 
   payment          Payment[] @relation(name: "PaymentsToRegistration")
-  registrationDate DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  registrationDate DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@unique([userId, eventId])
   @@map("registrations")
@@ -85,7 +87,7 @@ model Payment {
   invoiceUrl         String?
   createdAt          DateTime      @default(now())
 
-  registrationId String       
+  registrationId String
   registration   Registration @relation(fields: [registrationId], references: [id], name: "PaymentsToRegistration")
 
   @@index([registrationId])
@@ -110,10 +112,10 @@ model Review {
 }
 
 model Invitation {
-  id        String   @id @default(uuid())
-  eventId   String
-  userId    String
-  status    InvitationStatus @default(PENDING)
+  id      String           @id @default(uuid())
+  eventId String
+  userId  String
+  status  InvitationStatus @default(PENDING)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -146,4 +148,3 @@ enum InvitationStatus {
   ACCEPTED
   REJECTED
 }
-

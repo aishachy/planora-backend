@@ -3,34 +3,111 @@ import { prisma } from "../../app/lib/prisma.js";
 import { RegistrationStatus } from "../../generated/prisma/enums.js";
 
 // Register to event
-const registerToEvent = async (userId: string, eventId: string, status?: RegistrationStatus) => {
-  // Fetch event
-  const event = await prisma.event.findUnique({ where: { id: eventId } });
-  if (!event || event.isDeleted) throw new Error("Event not found");
-
-  // Prevent duplicate registrations
-  const existing = await prisma.registration.findUnique({
-    where: { userId_eventId: { userId, eventId } },
+const registerToEvent = async (
+  userId: string,
+  eventId: string,
+  status?: RegistrationStatus
+) => {
+  /* =========================
+     1. CHECK USER (BAN CHECK HERE)
+  ========================= */
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
   });
-  if (existing) throw new Error("Already registered for this event");
 
-  // Determine status
-  let registrationStatus: RegistrationStatus = RegistrationStatus.PENDING;
-  if (status) {
-    registrationStatus = status;
-  } else if (event.isPublic) {
-    registrationStatus = RegistrationStatus.APPROVED;
+  if (!user) throw new Error("User not found");
+
+  if (user.isBanned) {
+    throw new Error("You are banned from registering to events");
   }
 
-  // Create registration
+  /* =========================
+     2. FETCH EVENT
+  ========================= */
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+  });
+
+  if (!event || event.isDeleted) {
+    throw new Error("Event not found");
+  }
+
+  /* =========================
+     3. CHECK DUPLICATE REGISTRATION
+  ========================= */
+  const existing = await prisma.registration.findUnique({
+    where: {
+      userId_eventId: { userId, eventId },
+    },
+  });
+
+  if (existing) {
+    if (existing.status === RegistrationStatus.REJECTED) {
+      // allow re-apply
+    } else {
+      throw new Error("Already registered for this event");
+    }
+  }
+
+  /* =========================
+     4. DETERMINE STATUS (CORE LOGIC)
+  ========================= */
+  let registrationStatus: RegistrationStatus;
+
+  if (status) {
+    registrationStatus = status;
+  } else {
+    // PRIVATE EVENT → always pending
+    if (!event.isPublic) {
+      registrationStatus = RegistrationStatus.PENDING;
+    }
+
+    // PUBLIC FREE EVENT → auto approve
+    else if (event.isPublic && !event.isPaid) {
+      registrationStatus = RegistrationStatus.APPROVED;
+    }
+
+    // PUBLIC PAID EVENT → wait for payment
+    else if (event.isPublic && event.isPaid) {
+      registrationStatus = RegistrationStatus.PENDING;
+    }
+
+    // fallback
+    else {
+      registrationStatus = RegistrationStatus.PENDING;
+    }
+  }
+
+  /* =========================
+     5. CREATE REGISTRATION
+  ========================= */
   return prisma.registration.create({
-    data: { userId, eventId, status: registrationStatus },
+    data: {
+      userId,
+      eventId,
+      status: registrationStatus,
+    },
     include: {
       user: {
-        select: { id: true, name: true, email: true, role: true, createdAt: true, updatedAt: true },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
+        },
       },
       event: {
-        select: { id: true, title: true, date: true, venue: true, fee: true, createdAt: true, updatedAt: true },
+        select: {
+          id: true,
+          title: true,
+          date: true,
+          venue: true,
+          fee: true,
+          createdAt: true,
+          updatedAt: true,
+        },
       },
     },
   });

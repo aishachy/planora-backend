@@ -34,6 +34,8 @@ export type UserMinAggregateOutputType = {
   updatedAt: Date | null
   isDeleted: boolean | null
   deletedAt: Date | null
+  isBanned: boolean | null
+  bannedAt: Date | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -46,6 +48,8 @@ export type UserMaxAggregateOutputType = {
   updatedAt: Date | null
   isDeleted: boolean | null
   deletedAt: Date | null
+  isBanned: boolean | null
+  bannedAt: Date | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -58,6 +62,8 @@ export type UserCountAggregateOutputType = {
   updatedAt: number
   isDeleted: number
   deletedAt: number
+  isBanned: number
+  bannedAt: number
   _all: number
 }
 
@@ -72,6 +78,8 @@ export type UserMinAggregateInputType = {
   updatedAt?: true
   isDeleted?: true
   deletedAt?: true
+  isBanned?: true
+  bannedAt?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -84,6 +92,8 @@ export type UserMaxAggregateInputType = {
   updatedAt?: true
   isDeleted?: true
   deletedAt?: true
+  isBanned?: true
+  bannedAt?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -96,6 +106,8 @@ export type UserCountAggregateInputType = {
   updatedAt?: true
   isDeleted?: true
   deletedAt?: true
+  isBanned?: true
+  bannedAt?: true
   _all?: true
 }
 
@@ -181,6 +193,8 @@ export type UserGroupByOutputType = {
   updatedAt: Date
   isDeleted: boolean
   deletedAt: Date | null
+  isBanned: boolean
+  bannedAt: Date | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -214,6 +228,8 @@ export type UserWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   isDeleted?: Prisma.BoolFilter<"User"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  isBanned?: Prisma.BoolFilter<"User"> | boolean
+  bannedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   events?: Prisma.EventListRelationFilter
   registrations?: Prisma.RegistrationListRelationFilter
   reviews?: Prisma.ReviewListRelationFilter
@@ -230,6 +246,8 @@ export type UserOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  isBanned?: Prisma.SortOrder
+  bannedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   events?: Prisma.EventOrderByRelationAggregateInput
   registrations?: Prisma.RegistrationOrderByRelationAggregateInput
   reviews?: Prisma.ReviewOrderByRelationAggregateInput
@@ -249,6 +267,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   isDeleted?: Prisma.BoolFilter<"User"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  isBanned?: Prisma.BoolFilter<"User"> | boolean
+  bannedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   events?: Prisma.EventListRelationFilter
   registrations?: Prisma.RegistrationListRelationFilter
   reviews?: Prisma.ReviewListRelationFilter
@@ -265,6 +285,8 @@ export type UserOrderByWithAggregationInput = {
   updatedAt?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  isBanned?: Prisma.SortOrder
+  bannedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -283,6 +305,8 @@ export type UserScalarWhereWithAggregatesInput = {
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   isDeleted?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  isBanned?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  bannedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
 }
 
 export type UserCreateInput = {
@@ -295,6 +319,8 @@ export type UserCreateInput = {
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isBanned?: boolean
+  bannedAt?: Date | string | null
   events?: Prisma.EventCreateNestedManyWithoutOrganizerInput
   registrations?: Prisma.RegistrationCreateNestedManyWithoutUserInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
@@ -311,6 +337,8 @@ export type UserUncheckedCreateInput = {
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isBanned?: boolean
+  bannedAt?: Date | string | null
   events?: Prisma.EventUncheckedCreateNestedManyWithoutOrganizerInput
   registrations?: Prisma.RegistrationUncheckedCreateNestedManyWithoutUserInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
@@ -327,6 +355,8 @@ export type UserUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isBanned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   events?: Prisma.EventUpdateManyWithoutOrganizerNestedInput
   registrations?: Prisma.RegistrationUpdateManyWithoutUserNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
@@ -343,6 +373,8 @@ export type UserUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isBanned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   events?: Prisma.EventUncheckedUpdateManyWithoutOrganizerNestedInput
   registrations?: Prisma.RegistrationUncheckedUpdateManyWithoutUserNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
@@ -359,6 +391,8 @@ export type UserCreateManyInput = {
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isBanned?: boolean
+  bannedAt?: Date | string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -371,6 +405,8 @@ export type UserUpdateManyMutationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isBanned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -383,6 +419,8 @@ export type UserUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isBanned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -395,6 +433,8 @@ export type UserCountOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
+  isBanned?: Prisma.SortOrder
+  bannedAt?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -407,6 +447,8 @@ export type UserMaxOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
+  isBanned?: Prisma.SortOrder
+  bannedAt?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -419,6 +461,8 @@ export type UserMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
+  isBanned?: Prisma.SortOrder
+  bannedAt?: Prisma.SortOrder
 }
 
 export type UserNullableScalarRelationFilter = {
@@ -519,6 +563,8 @@ export type UserCreateWithoutEventsInput = {
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isBanned?: boolean
+  bannedAt?: Date | string | null
   registrations?: Prisma.RegistrationCreateNestedManyWithoutUserInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutUserInput
@@ -534,6 +580,8 @@ export type UserUncheckedCreateWithoutEventsInput = {
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isBanned?: boolean
+  bannedAt?: Date | string | null
   registrations?: Prisma.RegistrationUncheckedCreateNestedManyWithoutUserInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutUserInput
@@ -565,6 +613,8 @@ export type UserUpdateWithoutEventsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isBanned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrations?: Prisma.RegistrationUpdateManyWithoutUserNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutUserNestedInput
@@ -580,6 +630,8 @@ export type UserUncheckedUpdateWithoutEventsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isBanned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   registrations?: Prisma.RegistrationUncheckedUpdateManyWithoutUserNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutUserNestedInput
@@ -595,6 +647,8 @@ export type UserCreateWithoutRegistrationsInput = {
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isBanned?: boolean
+  bannedAt?: Date | string | null
   events?: Prisma.EventCreateNestedManyWithoutOrganizerInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutUserInput
@@ -610,6 +664,8 @@ export type UserUncheckedCreateWithoutRegistrationsInput = {
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isBanned?: boolean
+  bannedAt?: Date | string | null
   events?: Prisma.EventUncheckedCreateNestedManyWithoutOrganizerInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutUserInput
@@ -641,6 +697,8 @@ export type UserUpdateWithoutRegistrationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isBanned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   events?: Prisma.EventUpdateManyWithoutOrganizerNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutUserNestedInput
@@ -656,6 +714,8 @@ export type UserUncheckedUpdateWithoutRegistrationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isBanned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   events?: Prisma.EventUncheckedUpdateManyWithoutOrganizerNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutUserNestedInput
@@ -671,6 +731,8 @@ export type UserCreateWithoutReviewsInput = {
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isBanned?: boolean
+  bannedAt?: Date | string | null
   events?: Prisma.EventCreateNestedManyWithoutOrganizerInput
   registrations?: Prisma.RegistrationCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutUserInput
@@ -686,6 +748,8 @@ export type UserUncheckedCreateWithoutReviewsInput = {
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isBanned?: boolean
+  bannedAt?: Date | string | null
   events?: Prisma.EventUncheckedCreateNestedManyWithoutOrganizerInput
   registrations?: Prisma.RegistrationUncheckedCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutUserInput
@@ -717,6 +781,8 @@ export type UserUpdateWithoutReviewsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isBanned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   events?: Prisma.EventUpdateManyWithoutOrganizerNestedInput
   registrations?: Prisma.RegistrationUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutUserNestedInput
@@ -732,6 +798,8 @@ export type UserUncheckedUpdateWithoutReviewsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isBanned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   events?: Prisma.EventUncheckedUpdateManyWithoutOrganizerNestedInput
   registrations?: Prisma.RegistrationUncheckedUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutUserNestedInput
@@ -747,6 +815,8 @@ export type UserCreateWithoutInvitationsInput = {
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isBanned?: boolean
+  bannedAt?: Date | string | null
   events?: Prisma.EventCreateNestedManyWithoutOrganizerInput
   registrations?: Prisma.RegistrationCreateNestedManyWithoutUserInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
@@ -762,6 +832,8 @@ export type UserUncheckedCreateWithoutInvitationsInput = {
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isBanned?: boolean
+  bannedAt?: Date | string | null
   events?: Prisma.EventUncheckedCreateNestedManyWithoutOrganizerInput
   registrations?: Prisma.RegistrationUncheckedCreateNestedManyWithoutUserInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
@@ -793,6 +865,8 @@ export type UserUpdateWithoutInvitationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isBanned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   events?: Prisma.EventUpdateManyWithoutOrganizerNestedInput
   registrations?: Prisma.RegistrationUpdateManyWithoutUserNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
@@ -808,6 +882,8 @@ export type UserUncheckedUpdateWithoutInvitationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isBanned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bannedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   events?: Prisma.EventUncheckedUpdateManyWithoutOrganizerNestedInput
   registrations?: Prisma.RegistrationUncheckedUpdateManyWithoutUserNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
@@ -881,6 +957,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   isDeleted?: boolean
   deletedAt?: boolean
+  isBanned?: boolean
+  bannedAt?: boolean
   events?: boolean | Prisma.User$eventsArgs<ExtArgs>
   registrations?: boolean | Prisma.User$registrationsArgs<ExtArgs>
   reviews?: boolean | Prisma.User$reviewsArgs<ExtArgs>
@@ -898,6 +976,8 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   updatedAt?: boolean
   isDeleted?: boolean
   deletedAt?: boolean
+  isBanned?: boolean
+  bannedAt?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -910,6 +990,8 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   updatedAt?: boolean
   isDeleted?: boolean
   deletedAt?: boolean
+  isBanned?: boolean
+  bannedAt?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -922,9 +1004,11 @@ export type UserSelectScalar = {
   updatedAt?: boolean
   isDeleted?: boolean
   deletedAt?: boolean
+  isBanned?: boolean
+  bannedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "role" | "createdAt" | "updatedAt" | "isDeleted" | "deletedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "role" | "createdAt" | "updatedAt" | "isDeleted" | "deletedAt" | "isBanned" | "bannedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   events?: boolean | Prisma.User$eventsArgs<ExtArgs>
   registrations?: boolean | Prisma.User$registrationsArgs<ExtArgs>
@@ -953,6 +1037,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     updatedAt: Date
     isDeleted: boolean
     deletedAt: Date | null
+    isBanned: boolean
+    bannedAt: Date | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1389,6 +1475,8 @@ export interface UserFieldRefs {
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly isDeleted: Prisma.FieldRef<"User", 'Boolean'>
   readonly deletedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly isBanned: Prisma.FieldRef<"User", 'Boolean'>
+  readonly bannedAt: Prisma.FieldRef<"User", 'DateTime'>
 }
     
 

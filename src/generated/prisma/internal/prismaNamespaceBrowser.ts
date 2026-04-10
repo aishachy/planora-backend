@@ -84,7 +84,9 @@ export const UserScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   isDeleted: 'isDeleted',
-  deletedAt: 'deletedAt'
+  deletedAt: 'deletedAt',
+  isBanned: 'isBanned',
+  bannedAt: 'bannedAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]

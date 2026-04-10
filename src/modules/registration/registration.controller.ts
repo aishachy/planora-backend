@@ -1,23 +1,39 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
 import { registrationService } from "./registration.service.js";
-import { RegistrationStatus } from "../../generated/prisma/enums.js";
+
 
 // Register to an event
+
 export const registerToEvent = async (req: Request, res: Response) => {
   try {
-    const { userId, eventId, status } = req.body;
-    if (!userId || !eventId) return res.status(400).json({ success: false, message: "Missing userId or eventId" });
+    const { eventId, status } = req.body;
+
+    // 🔥 IMPORTANT: get user from auth middleware later
+    const userId = (req as any).user?.id || req.body.userId;
+
+    if (!userId || !eventId) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing userId or eventId",
+      });
+    }
 
     const registration = await registrationService.registerToEvent(
       userId,
       eventId,
-      status as RegistrationStatus
+      status
     );
 
-    res.status(201).json({ success: true, data: registration });
+    res.status(201).json({
+      success: true,
+      data: registration,
+    });
   } catch (error: any) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 

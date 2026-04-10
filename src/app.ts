@@ -7,12 +7,17 @@ import { reviewRouter } from "./modules/review/review.router.js";
 import { paymentRouter } from "./modules/payment/payment.router.js";
 import { adminRouter } from "./modules/admin/admin.router.js";
 import { registrationRouter } from "./modules/registration/registration.router.js";
-
+import cors from "cors";
 
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 
+
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true
+}))
 
 app.use("/api/payment", paymentRouter);
 
