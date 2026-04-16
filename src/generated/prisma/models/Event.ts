@@ -44,6 +44,7 @@ export type EventMinAggregateOutputType = {
   isPublic: boolean | null
   isPaid: boolean | null
   fee: number | null
+  isFeatured: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
   isDeleted: boolean | null
@@ -61,6 +62,7 @@ export type EventMaxAggregateOutputType = {
   isPublic: boolean | null
   isPaid: boolean | null
   fee: number | null
+  isFeatured: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
   isDeleted: boolean | null
@@ -78,6 +80,7 @@ export type EventCountAggregateOutputType = {
   isPublic: number
   isPaid: number
   fee: number
+  isFeatured: number
   createdAt: number
   updatedAt: number
   isDeleted: number
@@ -105,6 +108,7 @@ export type EventMinAggregateInputType = {
   isPublic?: true
   isPaid?: true
   fee?: true
+  isFeatured?: true
   createdAt?: true
   updatedAt?: true
   isDeleted?: true
@@ -122,6 +126,7 @@ export type EventMaxAggregateInputType = {
   isPublic?: true
   isPaid?: true
   fee?: true
+  isFeatured?: true
   createdAt?: true
   updatedAt?: true
   isDeleted?: true
@@ -139,6 +144,7 @@ export type EventCountAggregateInputType = {
   isPublic?: true
   isPaid?: true
   fee?: true
+  isFeatured?: true
   createdAt?: true
   updatedAt?: true
   isDeleted?: true
@@ -243,6 +249,7 @@ export type EventGroupByOutputType = {
   isPublic: boolean
   isPaid: boolean
   fee: number | null
+  isFeatured: boolean
   createdAt: Date
   updatedAt: Date
   isDeleted: boolean
@@ -283,6 +290,7 @@ export type EventWhereInput = {
   isPublic?: Prisma.BoolFilter<"Event"> | boolean
   isPaid?: Prisma.BoolFilter<"Event"> | boolean
   fee?: Prisma.FloatNullableFilter<"Event"> | number | null
+  isFeatured?: Prisma.BoolFilter<"Event"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   isDeleted?: Prisma.BoolFilter<"Event"> | boolean
@@ -304,6 +312,7 @@ export type EventOrderByWithRelationInput = {
   isPublic?: Prisma.SortOrder
   isPaid?: Prisma.SortOrder
   fee?: Prisma.SortOrderInput | Prisma.SortOrder
+  isFeatured?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
@@ -328,6 +337,7 @@ export type EventWhereUniqueInput = Prisma.AtLeast<{
   isPublic?: Prisma.BoolFilter<"Event"> | boolean
   isPaid?: Prisma.BoolFilter<"Event"> | boolean
   fee?: Prisma.FloatNullableFilter<"Event"> | number | null
+  isFeatured?: Prisma.BoolFilter<"Event"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   isDeleted?: Prisma.BoolFilter<"Event"> | boolean
@@ -349,6 +359,7 @@ export type EventOrderByWithAggregationInput = {
   isPublic?: Prisma.SortOrder
   isPaid?: Prisma.SortOrder
   fee?: Prisma.SortOrderInput | Prisma.SortOrder
+  isFeatured?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
@@ -374,6 +385,7 @@ export type EventScalarWhereWithAggregatesInput = {
   isPublic?: Prisma.BoolWithAggregatesFilter<"Event"> | boolean
   isPaid?: Prisma.BoolWithAggregatesFilter<"Event"> | boolean
   fee?: Prisma.FloatNullableWithAggregatesFilter<"Event"> | number | null
+  isFeatured?: Prisma.BoolWithAggregatesFilter<"Event"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
   isDeleted?: Prisma.BoolWithAggregatesFilter<"Event"> | boolean
@@ -391,6 +403,7 @@ export type EventCreateInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
+  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
@@ -411,6 +424,7 @@ export type EventUncheckedCreateInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
+  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
@@ -431,6 +445,7 @@ export type EventUpdateInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -451,6 +466,7 @@ export type EventUncheckedUpdateInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -471,6 +487,7 @@ export type EventCreateManyInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
+  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
@@ -488,6 +505,7 @@ export type EventUpdateManyMutationInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -504,6 +522,7 @@ export type EventUncheckedUpdateManyInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -531,6 +550,7 @@ export type EventCountOrderByAggregateInput = {
   isPublic?: Prisma.SortOrder
   isPaid?: Prisma.SortOrder
   fee?: Prisma.SortOrder
+  isFeatured?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
@@ -552,6 +572,7 @@ export type EventMaxOrderByAggregateInput = {
   isPublic?: Prisma.SortOrder
   isPaid?: Prisma.SortOrder
   fee?: Prisma.SortOrder
+  isFeatured?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
@@ -569,6 +590,7 @@ export type EventMinOrderByAggregateInput = {
   isPublic?: Prisma.SortOrder
   isPaid?: Prisma.SortOrder
   fee?: Prisma.SortOrder
+  isFeatured?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
@@ -691,6 +713,7 @@ export type EventCreateWithoutOrganizerInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
+  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
@@ -710,6 +733,7 @@ export type EventUncheckedCreateWithoutOrganizerInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
+  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
@@ -758,6 +782,7 @@ export type EventScalarWhereInput = {
   isPublic?: Prisma.BoolFilter<"Event"> | boolean
   isPaid?: Prisma.BoolFilter<"Event"> | boolean
   fee?: Prisma.FloatNullableFilter<"Event"> | number | null
+  isFeatured?: Prisma.BoolFilter<"Event"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   isDeleted?: Prisma.BoolFilter<"Event"> | boolean
@@ -775,6 +800,7 @@ export type EventCreateWithoutRegistrationsInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
+  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
@@ -794,6 +820,7 @@ export type EventUncheckedCreateWithoutRegistrationsInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
+  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
@@ -829,6 +856,7 @@ export type EventUpdateWithoutRegistrationsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -848,6 +876,7 @@ export type EventUncheckedUpdateWithoutRegistrationsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -867,6 +896,7 @@ export type EventCreateWithoutReviewsInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
+  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
@@ -886,6 +916,7 @@ export type EventUncheckedCreateWithoutReviewsInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
+  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
@@ -921,6 +952,7 @@ export type EventUpdateWithoutReviewsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -940,6 +972,7 @@ export type EventUncheckedUpdateWithoutReviewsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -959,6 +992,7 @@ export type EventCreateWithoutInvitationsInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
+  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
@@ -978,6 +1012,7 @@ export type EventUncheckedCreateWithoutInvitationsInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
+  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
@@ -1013,6 +1048,7 @@ export type EventUpdateWithoutInvitationsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1032,6 +1068,7 @@ export type EventUncheckedUpdateWithoutInvitationsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1051,6 +1088,7 @@ export type EventCreateManyOrganizerInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
+  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
@@ -1067,6 +1105,7 @@ export type EventUpdateWithoutOrganizerInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1086,6 +1125,7 @@ export type EventUncheckedUpdateWithoutOrganizerInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1105,6 +1145,7 @@ export type EventUncheckedUpdateManyWithoutOrganizerInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1170,6 +1211,7 @@ export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   isPublic?: boolean
   isPaid?: boolean
   fee?: boolean
+  isFeatured?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   isDeleted?: boolean
@@ -1192,6 +1234,7 @@ export type EventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   isPublic?: boolean
   isPaid?: boolean
   fee?: boolean
+  isFeatured?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   isDeleted?: boolean
@@ -1210,6 +1253,7 @@ export type EventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   isPublic?: boolean
   isPaid?: boolean
   fee?: boolean
+  isFeatured?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   isDeleted?: boolean
@@ -1228,6 +1272,7 @@ export type EventSelectScalar = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: boolean
+  isFeatured?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   isDeleted?: boolean
@@ -1235,7 +1280,7 @@ export type EventSelectScalar = {
   organizerId?: boolean
 }
 
-export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "date" | "time" | "venue" | "isPublic" | "isPaid" | "fee" | "createdAt" | "updatedAt" | "isDeleted" | "deletedAt" | "organizerId", ExtArgs["result"]["event"]>
+export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "date" | "time" | "venue" | "isPublic" | "isPaid" | "fee" | "isFeatured" | "createdAt" | "updatedAt" | "isDeleted" | "deletedAt" | "organizerId", ExtArgs["result"]["event"]>
 export type EventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organizer?: boolean | Prisma.Event$organizerArgs<ExtArgs>
   registrations?: boolean | Prisma.Event$registrationsArgs<ExtArgs>
@@ -1268,6 +1313,7 @@ export type $EventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     isPublic: boolean
     isPaid: boolean
     fee: number | null
+    isFeatured: boolean
     createdAt: Date
     updatedAt: Date
     isDeleted: boolean
@@ -1709,6 +1755,7 @@ export interface EventFieldRefs {
   readonly isPublic: Prisma.FieldRef<"Event", 'Boolean'>
   readonly isPaid: Prisma.FieldRef<"Event", 'Boolean'>
   readonly fee: Prisma.FieldRef<"Event", 'Float'>
+  readonly isFeatured: Prisma.FieldRef<"Event", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Event", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Event", 'DateTime'>
   readonly isDeleted: Prisma.FieldRef<"Event", 'Boolean'>

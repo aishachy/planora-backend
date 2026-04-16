@@ -102,6 +102,13 @@ const updateEvent = async (id: string, data: Partial<EventInput>) => {
     });
 };
 
+const getFeaturedEvent = async () => {
+    return await prisma.event.findFirst({
+        where: { isFeatured: true },
+        orderBy: { createdAt: "desc" },
+    });
+};
+
 const deleteEvent = async (id: string) => {
     await getEventById(id);
     return await prisma.event.update({
@@ -118,5 +125,6 @@ export const eventService = {
     getAllEvents,
     getEventById,
     updateEvent,
+    getFeaturedEvent,
     deleteEvent,
 };

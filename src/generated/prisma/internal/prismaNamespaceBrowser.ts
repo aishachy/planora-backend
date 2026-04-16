@@ -102,6 +102,7 @@ export const EventScalarFieldEnum = {
   isPublic: 'isPublic',
   isPaid: 'isPaid',
   fee: 'fee',
+  isFeatured: 'isFeatured',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   isDeleted: 'isDeleted',

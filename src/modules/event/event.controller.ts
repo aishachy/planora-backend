@@ -2,6 +2,7 @@
 import { Request, Response } from "express";
 import { eventService } from "./event.service.js";
 
+
 const createEvent = async (req: Request, res: Response) => {
     try {
         const data = { ...req.body, organizerId: req.user!.id };
@@ -66,6 +67,22 @@ const updateEvent = async (req: Request, res: Response) => {
     }
 };
 
+const getFeaturedEvent = async (req: Request, res: Response) => {
+    try {
+        const event = await eventService.getFeaturedEvent();
+
+        return res.status(200).json({
+            success: true,
+            event,
+        });
+    } catch (err: any) {
+        return res.status(400).json({
+            success: false,
+            message: err.message,
+        });
+    }
+};
+
 const deleteEvent = async (req: Request, res: Response) => {
     try {
         const eventId = String(req.params.id);
@@ -87,5 +104,6 @@ export const eventController = {
     getAllEvents,
     getEventById,
     updateEvent,
+    getFeaturedEvent,
     deleteEvent,
 };

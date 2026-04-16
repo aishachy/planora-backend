@@ -45,6 +45,7 @@ model Event {
   isPublic      Boolean        @default(true)
   isPaid        Boolean        @default(false)
   fee           Float?
+  isFeatured    Boolean        @default(false)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   isDeleted     Boolean        @default(false)
