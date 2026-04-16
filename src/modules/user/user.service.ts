@@ -20,7 +20,10 @@ interface UpdateUserInput {
 ========================= */
 const createUser = async (data: CreateUserInput) => {
   const existingUser = await prisma.user.findUnique({
-    where: { email: data.email },
+    where: {
+      email: data.email,
+      isDeleted: false,
+    },
   });
 
   if (existingUser)
@@ -180,6 +183,6 @@ export const userService = {
   getUserById,
   updateUser,
   deleteUser,
-  banUser,     
-  unbanUser,   
+  banUser,
+  unbanUser,
 };

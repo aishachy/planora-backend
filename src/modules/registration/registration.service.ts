@@ -49,6 +49,18 @@ const registerToEvent = async (
     }
   }
 
+  const blocked = await prisma.registration.findFirst({
+    where: {
+      userId,
+      eventId,
+      status: "BLOCKED",
+    },
+  });
+
+  if (blocked) {
+    throw new Error("You are blocked from this event");
+  }
+
   /* =========================
      4. DETERMINE STATUS (CORE LOGIC)
   ========================= */
@@ -145,6 +157,43 @@ const rejectRegistration = async (id: string) =>
     data: { status: RegistrationStatus.REJECTED },
   });
 
+const banParticipant = async (
+  userId: string,
+  eventId: string,
+  ownerId: string
+) => {
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+  });
+
+  if (!event) throw new Error("Event not found");
+
+  if (event.organizerId !== ownerId) {
+    throw new Error("Not allowed");
+  }
+
+  const registration = await prisma.registration.findUnique({
+    where: {
+      userId_eventId: { userId, eventId },
+    },
+  });
+
+  if (registration) {
+    return prisma.registration.update({
+      where: { id: registration.id },
+      data: { status: "BLOCKED" },
+    });
+  }
+
+  return prisma.registration.create({
+    data: {
+      userId,
+      eventId,
+      status: "BLOCKED",
+    },
+  });
+};
+
 // Delete registration
 const deleteRegistration = async (id: string) =>
   prisma.registration.delete({ where: { id } });
@@ -156,4 +205,5 @@ export const registrationService = {
   approveRegistration,
   rejectRegistration,
   deleteRegistration,
+  banParticipant
 };

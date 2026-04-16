@@ -94,3 +94,25 @@ export const deleteRegistration = async (req: Request, res: Response) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+
+export const banParticipant = async (req: Request, res: Response) => {
+  try {
+    const { userId, eventId, ownerId } = req.body;
+
+    const result = await registrationService.banParticipant(
+      userId,
+      eventId,
+      ownerId
+    );
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

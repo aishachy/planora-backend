@@ -6,6 +6,7 @@ import {
   approveRegistration,
   rejectRegistration,
   deleteRegistration,
+  banParticipant,
 } from "./registration.controller.js";
 
 const router = Router();
@@ -25,5 +26,7 @@ router.patch("/reject/:id", rejectRegistration);
 
 // Delete a registration
 router.delete("/:id", deleteRegistration);
+
+router.post("/ban", banParticipant);
 
 export const registrationRouter = router;

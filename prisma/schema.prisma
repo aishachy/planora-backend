@@ -135,6 +135,7 @@ enum RegistrationStatus {
   PENDING
   APPROVED
   REJECTED
+  BLOCKED
 }
 
 enum PaymentStatus {
