@@ -103,10 +103,25 @@ const updateEvent = async (id: string, data: Partial<EventInput>) => {
 };
 
 const getFeaturedEvent = async () => {
-    return await prisma.event.findFirst({
-        where: { isFeatured: true },
-        orderBy: { createdAt: "desc" },
+  let event = await prisma.event.findFirst({
+    where: {
+      isFeatured: true,
+      isDeleted: false,
+    },
+  });
+
+  if (!event) {
+    event = await prisma.event.findFirst({
+      where: {
+        isDeleted: false,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
+  }
+
+  return event;
 };
 
 const deleteEvent = async (id: string) => {
