@@ -73,7 +73,7 @@ const getFeaturedEvent = async (req: Request, res: Response) => {
 
         return res.status(200).json({
             success: true,
-            event,
+            data: event,
         });
     } catch (err: any) {
         return res.status(400).json({
