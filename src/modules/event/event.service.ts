@@ -74,8 +74,9 @@ const getEventById = async (id: string) => {
             reviews: true,
         },
     });
-    if (!event || event.isDeleted)
-        throw new Error("Event not found");
+    if (!event || event.isDeleted) {
+        return null;
+    }
     return event;
 };
 
@@ -103,14 +104,14 @@ const updateEvent = async (id: string, data: Partial<EventInput>) => {
 };
 
 const getFeaturedEvent = async () => {
-  const event = await prisma.event.findFirst({
-    where: {
-      isFeatured: true,
-      isDeleted: false,
-    },
-  });
+    const event = await prisma.event.findFirst({
+        where: {
+            isFeatured: true,
+            isDeleted: false,
+        },
+    });
 
-  return event; 
+    return event;
 };
 
 const deleteEvent = async (id: string) => {
