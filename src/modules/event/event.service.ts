@@ -81,7 +81,11 @@ const getEventById = async (id: string) => {
 };
 
 const updateEvent = async (id: string, data: Partial<EventInput>) => {
-    await getEventById(id);
+    const event = await getEventById(id);
+
+    if (!event) {
+        throw new Error("Event not found");
+    }
     return await prisma.event.update({
         where: { id },
         data,
@@ -115,7 +119,11 @@ const getFeaturedEvent = async () => {
 };
 
 const deleteEvent = async (id: string) => {
-    await getEventById(id);
+    const event = await getEventById(id);
+
+    if (!event) {
+        throw new Error("Event not found");
+    }
     return await prisma.event.update({
         where: { id },
         data: {
