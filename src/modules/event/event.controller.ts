@@ -68,28 +68,27 @@ const updateEvent = async (req: Request, res: Response) => {
 };
 
 const getFeaturedEvent = async (req: Request, res: Response) => {
-    try {
-        const event = await eventService.getFeaturedEvent();
+  try {
+    const events = await eventService.getFeaturedEvent();
 
-        if (!event) {
-            return res.status(404).json({
-                success: false,
-                message: "No featured event found",
-                data: null,
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            data: event,
-        });
-
-    } catch (err: any) {
-        return res.status(500).json({
-            success: false,
-            message: err.message,
-        });
+    if (!events || events.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No featured events found",
+        data: [],
+      });
     }
+
+    return res.status(200).json({
+      success: true,
+      data: events,
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
 };
 
 const deleteEvent = async (req: Request, res: Response) => {
