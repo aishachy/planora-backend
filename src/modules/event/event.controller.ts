@@ -68,50 +68,51 @@ const updateEvent = async (req: Request, res: Response) => {
 };
 
 const getFeaturedEvent = async (req: Request, res: Response) => {
-  try {
-    const events = await eventService.getFeaturedEvent();
-
-    if (!events || events.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No featured events found",
-        data: [],
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      data: events,
-    });
-  } catch (err: any) {
-    return res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
-};
-
-const deleteEvent = async (req: Request, res: Response) => {
+    console.log("🔥 FEATURED EVENT API HIT");
     try {
-        const eventId = String(req.params.id);
-        const result = await eventService.deleteEvent(eventId);
-        res.status(200).json({
-            success: true,
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Events deletion failed",
-        });
-    }
-};
+        const events = await eventService.getFeaturedEvent();
 
-export const eventController = {
-    createEvent,
-    getAllEvents,
-    getEventById,
-    updateEvent,
-    getFeaturedEvent,
-    deleteEvent,
-};
+            if (!events || events.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: "No featured events found",
+                    data: [],
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                data: events,
+            });
+        } catch (err: any) {
+            return res.status(500).json({
+                success: false,
+                message: err.message,
+            });
+        }
+    };
+
+    const deleteEvent = async (req: Request, res: Response) => {
+        try {
+            const eventId = String(req.params.id);
+            const result = await eventService.deleteEvent(eventId);
+            res.status(200).json({
+                success: true,
+                data: result,
+            });
+        } catch (error: any) {
+            res.status(400).json({
+                success: false,
+                message: error.message || "Events deletion failed",
+            });
+        }
+    };
+
+    export const eventController = {
+        createEvent,
+        getAllEvents,
+        getEventById,
+        updateEvent,
+        getFeaturedEvent,
+        deleteEvent,
+    };

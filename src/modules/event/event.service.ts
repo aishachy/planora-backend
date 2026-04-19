@@ -106,15 +106,13 @@ const updateEvent = async (id: string, data: Partial<EventInput>) => {
         },
     });
 };
+
 const getFeaturedEvent = async () => {
   const events = await prisma.event.findMany({
-    where: {
-      isFeatured: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
+    where: { isFeatured: true },
   });
+
+  console.log("FEATURED EVENTS:", events);
 
   return events;
 };
