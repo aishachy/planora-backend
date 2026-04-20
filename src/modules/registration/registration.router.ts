@@ -14,23 +14,23 @@ import auth from "../../middleware/auth.js";
 const router = Router();
 
 // Register for an event
-router.post("/", auth(), registerToEvent);
+router.post("/", auth("ADMIN"), registerToEvent);
 
 // Get all registrations (admin)
-router.get("/", auth(), getAllRegistrations);
+router.get("/", auth("ADMIN"), getAllRegistrations);
 
 // Get a user's registrations
-router.get("/me", auth(), getMyRegistrations);
-router.get("/event/:eventId", auth(), getEventRegistrations);
+router.get("/me", auth("USER"), getMyRegistrations);
+router.get("/event/:eventId", auth("USER"), getEventRegistrations);
 
 
 // Approve / Reject registrations
-router.patch("/approve/:id", auth(), approveRegistration);
-router.patch("/reject/:id", auth(), rejectRegistration);
+router.patch("/approve/:id", auth("ADMIN"), approveRegistration);
+router.patch("/reject/:id", auth("ADMIN"), rejectRegistration);
 
 // Delete a registration
-router.delete("/:id", auth(), deleteRegistration);
+router.delete("/:id", auth("ADMIN"), deleteRegistration);
 
-router.post("/ban", auth(), banParticipant);
+router.post("/ban", auth("ADMIN"), banParticipant);
 
 export const registrationRouter = router;
