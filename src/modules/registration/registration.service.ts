@@ -2,15 +2,15 @@
 import { prisma } from "../../app/lib/prisma.js";
 import { RegistrationStatus } from "../../generated/prisma/enums.js";
 
-// Register to event
+/* =====================================================
+   REGISTER TO EVENT
+===================================================== */
 const registerToEvent = async (
   userId: string,
   eventId: string,
   status?: RegistrationStatus
 ) => {
-  /* =========================
-     1. CHECK USER (BAN CHECK HERE)
-  ========================= */
+  // 1. CHECK USER
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });
@@ -21,9 +21,7 @@ const registerToEvent = async (
     throw new Error("You are banned from registering to events");
   }
 
-  /* =========================
-     2. FETCH EVENT
-  ========================= */
+  // 2. FETCH EVENT
   const event = await prisma.event.findUnique({
     where: { id: eventId },
   });
@@ -32,28 +30,17 @@ const registerToEvent = async (
     throw new Error("Event not found");
   }
 
-  /* =========================
-     3. CHECK DUPLICATE REGISTRATION
-  ========================= */
-  const existing = await prisma.registration.findUnique({
-    where: {
-      userId_eventId: { userId, eventId },
-    },
-  });
-
-  if (existing) {
-    if (existing.status === RegistrationStatus.REJECTED) {
-      // allow re-apply
-    } else {
-      throw new Error("Already registered for this event");
-    }
+  // 🚫 Prevent owner registering own event
+  if (event.organizerId === userId) {
+    throw new Error("You cannot register for your own event");
   }
 
+  // 3. BLOCK CHECK (FIRST)
   const blocked = await prisma.registration.findFirst({
     where: {
       userId,
       eventId,
-      status: "BLOCKED",
+      status: RegistrationStatus.BLOCKED,
     },
   });
 
@@ -61,38 +48,62 @@ const registerToEvent = async (
     throw new Error("You are blocked from this event");
   }
 
-  /* =========================
-     4. DETERMINE STATUS (CORE LOGIC)
-  ========================= */
+  // 4. CHECK EXISTING REGISTRATION
+  const existing = await prisma.registration.findUnique({
+    where: {
+      userId_eventId: { userId, eventId },
+    },
+  });
+
+  // 5. DETERMINE STATUS
   let registrationStatus: RegistrationStatus;
 
   if (status) {
     registrationStatus = status;
+  } else if (!event.isPublic) {
+    registrationStatus = RegistrationStatus.PENDING;
+  } else if (event.isPublic && !event.isPaid) {
+    registrationStatus = RegistrationStatus.APPROVED;
   } else {
-    // PRIVATE EVENT → always pending
-    if (!event.isPublic) {
-      registrationStatus = RegistrationStatus.PENDING;
-    }
-
-    // PUBLIC FREE EVENT → auto approve
-    else if (event.isPublic && !event.isPaid) {
-      registrationStatus = RegistrationStatus.APPROVED;
-    }
-
-    // PUBLIC PAID EVENT → wait for payment
-    else if (event.isPublic && event.isPaid) {
-      registrationStatus = RegistrationStatus.PENDING;
-    }
-
-    // fallback
-    else {
-      registrationStatus = RegistrationStatus.PENDING;
-    }
+    registrationStatus = RegistrationStatus.PENDING;
   }
 
-  /* =========================
-     5. CREATE REGISTRATION
-  ========================= */
+  // 6. HANDLE RE-APPLY (IMPORTANT FIX)
+  if (existing) {
+    if (existing.status === RegistrationStatus.REJECTED) {
+      return prisma.registration.update({
+        where: {
+          userId_eventId: { userId, eventId },
+        },
+        data: {
+          status: registrationStatus,
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              role: true,
+            },
+          },
+          event: {
+            select: {
+              id: true,
+              title: true,
+              date: true,
+              venue: true,
+              fee: true,
+            },
+          },
+        },
+      });
+    }
+
+    throw new Error("Already registered for this event");
+  }
+
+  // 7. CREATE NEW REGISTRATION
   return prisma.registration.create({
     data: {
       userId,
@@ -106,8 +117,6 @@ const registerToEvent = async (
           name: true,
           email: true,
           role: true,
-          createdAt: true,
-          updatedAt: true,
         },
       },
       event: {
@@ -117,15 +126,15 @@ const registerToEvent = async (
           date: true,
           venue: true,
           fee: true,
-          createdAt: true,
-          updatedAt: true,
         },
       },
     },
   });
 };
 
-// Get all registrations
+/* =====================================================
+   GET ALL REGISTRATIONS
+===================================================== */
 const getAllRegistrations = async () =>
   prisma.registration.findMany({
     include: {
@@ -134,7 +143,9 @@ const getAllRegistrations = async () =>
     },
   });
 
-// Get registrations for a specific user
+/* =====================================================
+   GET MY REGISTRATIONS
+===================================================== */
 const getMyRegistrations = async (userId: string) =>
   prisma.registration.findMany({
     where: { userId },
@@ -143,20 +154,62 @@ const getMyRegistrations = async (userId: string) =>
     },
   });
 
-// Approve registration
-const approveRegistration = async (id: string) =>
-  prisma.registration.update({
+/* =====================================================
+   GET EVENT REGISTRATIONS (FOR OWNER DASHBOARD)
+===================================================== */
+const getEventRegistrations = async (eventId: string) =>
+  prisma.registration.findMany({
+    where: { eventId },
+    include: {
+      user: { select: { id: true, name: true, email: true } },
+    },
+  });
+
+/* =====================================================
+   APPROVE REGISTRATION (OWNER ONLY)
+===================================================== */
+const approveRegistration = async (id: string, ownerId: string) => {
+  const registration = await prisma.registration.findUnique({
+    where: { id },
+    include: { event: true },
+  });
+
+  if (!registration) throw new Error("Registration not found");
+
+  if (registration.event.organizerId !== ownerId) {
+    throw new Error("Not authorized");
+  }
+
+  return prisma.registration.update({
     where: { id },
     data: { status: RegistrationStatus.APPROVED },
   });
+};
 
-// Reject registration
-const rejectRegistration = async (id: string) =>
-  prisma.registration.update({
+/* =====================================================
+   REJECT REGISTRATION (OWNER ONLY)
+===================================================== */
+const rejectRegistration = async (id: string, ownerId: string) => {
+  const registration = await prisma.registration.findUnique({
+    where: { id },
+    include: { event: true },
+  });
+
+  if (!registration) throw new Error("Registration not found");
+
+  if (registration.event.organizerId !== ownerId) {
+    throw new Error("Not authorized");
+  }
+
+  return prisma.registration.update({
     where: { id },
     data: { status: RegistrationStatus.REJECTED },
   });
+};
 
+/* =====================================================
+   BAN PARTICIPANT (OWNER ONLY)
+===================================================== */
 const banParticipant = async (
   userId: string,
   eventId: string,
@@ -169,7 +222,7 @@ const banParticipant = async (
   if (!event) throw new Error("Event not found");
 
   if (event.organizerId !== ownerId) {
-    throw new Error("Not allowed");
+    throw new Error("Not authorized");
   }
 
   const registration = await prisma.registration.findUnique({
@@ -181,7 +234,7 @@ const banParticipant = async (
   if (registration) {
     return prisma.registration.update({
       where: { id: registration.id },
-      data: { status: "BLOCKED" },
+      data: { status: RegistrationStatus.BLOCKED },
     });
   }
 
@@ -189,21 +242,27 @@ const banParticipant = async (
     data: {
       userId,
       eventId,
-      status: "BLOCKED",
+      status: RegistrationStatus.BLOCKED,
     },
   });
 };
 
-// Delete registration
+/* =====================================================
+   DELETE REGISTRATION
+===================================================== */
 const deleteRegistration = async (id: string) =>
   prisma.registration.delete({ where: { id } });
 
+/* =====================================================
+   EXPORT SERVICE
+===================================================== */
 export const registrationService = {
   registerToEvent,
   getAllRegistrations,
   getMyRegistrations,
+  getEventRegistrations,
   approveRegistration,
   rejectRegistration,
+  banParticipant,
   deleteRegistration,
-  banParticipant
 };

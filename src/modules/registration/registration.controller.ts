@@ -2,15 +2,13 @@
 import { Request, Response } from "express";
 import { registrationService } from "./registration.service.js";
 
-
-// Register to an event
-
+/* =====================================================
+   REGISTER TO EVENT
+===================================================== */
 export const registerToEvent = async (req: Request, res: Response) => {
   try {
     const { eventId, status } = req.body;
-
-    // 🔥 IMPORTANT: get user from auth middleware later
-    const userId = (req as any).user?.id || req.body.userId;
+    const userId = (req as any).user?.id;
 
     if (!userId || !eventId) {
       return res.status(400).json({
@@ -37,7 +35,9 @@ export const registerToEvent = async (req: Request, res: Response) => {
   }
 };
 
-// Get all registrations
+/* =====================================================
+   GET ALL REGISTRATIONS
+===================================================== */
 export const getAllRegistrations = async (_req: Request, res: Response) => {
   try {
     const registrations = await registrationService.getAllRegistrations();
@@ -47,57 +47,107 @@ export const getAllRegistrations = async (_req: Request, res: Response) => {
   }
 };
 
-// Get registrations for a user
+/* =====================================================
+   GET MY REGISTRATIONS
+===================================================== */
 export const getMyRegistrations = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
-    const id = Array.isArray(userId) ? userId[0] : userId;
-    const registrations = await registrationService.getMyRegistrations(id);
+    const userId = (req as any).user?.id;
+
+    const registrations = await registrationService.getMyRegistrations(userId);
+
     res.status(200).json({ success: true, data: registrations });
   } catch (error: any) {
     res.status(400).json({ success: false, message: error.message });
   }
 };
 
-// Approve registration
+/* =====================================================
+   GET EVENT REGISTRATIONS (OWNER DASHBOARD)
+===================================================== */
+export const getEventRegistrations = async (req: Request, res: Response) => {
+  try {
+    const eventId = String(req.params.eventId);
+
+    const registrations =
+      await registrationService.getEventRegistrations(eventId);
+
+    res.status(200).json({
+      success: true,
+      data: registrations,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/* =====================================================
+   APPROVE REGISTRATION (OWNER ONLY)
+===================================================== */
 export const approveRegistration = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const registrationId = Array.isArray(id) ? id[0] : id;
-    const updated = await registrationService.approveRegistration(registrationId);
-    res.status(200).json({ success: true, data: updated });
+    const id  = String(req.params);
+    const ownerId = (req as any).user?.id;
+
+    const updated = await registrationService.approveRegistration(
+      id,
+      ownerId
+    );
+
+    res.status(200).json({
+      success: true,
+      data: updated,
+    });
   } catch (error: any) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
-// Reject registration
+/* =====================================================
+   REJECT REGISTRATION (OWNER ONLY)
+===================================================== */
 export const rejectRegistration = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const registrationId = Array.isArray(id) ? id[0] : id;
-    const updated = await registrationService.rejectRegistration(registrationId);
-    res.status(200).json({ success: true, data: updated });
+    const id  = String(req.params);
+    const ownerId = (req as any).user?.id;
+
+    const updated = await registrationService.rejectRegistration(
+      id,
+      ownerId
+    );
+
+    res.status(200).json({
+      success: true,
+      data: updated,
+    });
   } catch (error: any) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
-// Delete registration
-export const deleteRegistration = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const registrationId = Array.isArray(id) ? id[0] : id;
-    const deleted = await registrationService.deleteRegistration(registrationId);
-    res.status(200).json({ success: true, data: deleted });
-  } catch (error: any) {
-    res.status(400).json({ success: false, message: error.message });
-  }
-};
-
+/* =====================================================
+   BAN PARTICIPANT (OWNER ONLY)
+===================================================== */
 export const banParticipant = async (req: Request, res: Response) => {
   try {
-    const { userId, eventId, ownerId } = req.body;
+    const { userId, eventId } = req.body;
+    const ownerId = (req as any).user?.id;
+
+    if (!userId || !eventId) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing userId or eventId",
+      });
+    }
 
     const result = await registrationService.banParticipant(
       userId,
@@ -108,6 +158,27 @@ export const banParticipant = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       data: result,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/* =====================================================
+   DELETE REGISTRATION
+===================================================== */
+export const deleteRegistration = async (req: Request, res: Response) => {
+  try {
+    const id = String(req.params.id);
+
+    const deleted = await registrationService.deleteRegistration(id);
+
+    res.status(200).json({
+      success: true,
+      data: deleted,
     });
   } catch (error: any) {
     res.status(400).json({
