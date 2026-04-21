@@ -35,6 +35,24 @@ const getAllEvents = async (_req: Request, res: Response) => {
     }
 }
 
+const getMyEvents = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user!.id;
+
+        const result = await eventService.getMyEvents(userId);
+
+        res.status(200).json({
+            success: true,
+            data: result,
+        });
+    } catch (error: any) {
+        res.status(400).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
 const getEventById = async (req: Request, res: Response) => {
     try {
         const eventId = String(req.params.id);
@@ -51,10 +69,28 @@ const getEventById = async (req: Request, res: Response) => {
     }
 };
 
+const getEventParticipants = async (req: Request, res: Response) => {
+    try {
+        const eventId = String(req.params.id);
+
+        const result = await eventService.getEventParticipants(eventId);
+
+        res.status(200).json({
+            success: true,
+            data: result,
+        });
+    } catch (error: any) {
+        res.status(400).json({
+            success: false,
+            message: error.message || "Failed to get participants",
+        });
+    }
+};
+
 const updateEvent = async (req: Request, res: Response) => {
     try {
         const eventId = String(req.params.id);
-        const result = await eventService.updateEvent(eventId, req.body);
+        const result = await eventService.updateEvent(eventId, req.body, req.user!.id);
         res.status(200).json({
             success: true,
             data: result,
@@ -72,47 +108,49 @@ const getFeaturedEvent = async (req: Request, res: Response) => {
     try {
         const events = await eventService.getFeaturedEvent();
 
-            if (!events || events.length === 0) {
-                return res.status(404).json({
-                    success: false,
-                    message: "No featured events found",
-                    data: [],
-                });
-            }
-
-            return res.status(200).json({
-                success: true,
-                data: events,
-            });
-        } catch (err: any) {
-            return res.status(500).json({
+        if (!events || events.length === 0) {
+            return res.status(404).json({
                 success: false,
-                message: err.message,
+                message: "No featured events found",
+                data: [],
             });
         }
-    };
 
-    const deleteEvent = async (req: Request, res: Response) => {
-        try {
-            const eventId = String(req.params.id);
-            const result = await eventService.deleteEvent(eventId);
-            res.status(200).json({
-                success: true,
-                data: result,
-            });
-        } catch (error: any) {
-            res.status(400).json({
-                success: false,
-                message: error.message || "Events deletion failed",
-            });
-        }
-    };
+        return res.status(200).json({
+            success: true,
+            data: events,
+        });
+    } catch (err: any) {
+        return res.status(500).json({
+            success: false,
+            message: err.message,
+        });
+    }
+};
 
-    export const eventController = {
-        createEvent,
-        getAllEvents,
-        getEventById,
-        updateEvent,
-        getFeaturedEvent,
-        deleteEvent,
-    };
+const deleteEvent = async (req: Request, res: Response) => {
+    try {
+        const eventId = String(req.params.id);
+        const result = await eventService.deleteEvent(eventId, req.user!.id);
+        res.status(200).json({
+            success: true,
+            data: result,
+        });
+    } catch (error: any) {
+        res.status(400).json({
+            success: false,
+            message: error.message || "Events deletion failed",
+        });
+    }
+};
+
+export const eventController = {
+    createEvent,
+    getAllEvents,
+    getEventById,
+    getEventParticipants,
+    updateEvent,
+    getFeaturedEvent,
+    deleteEvent,
+    getMyEvents
+};

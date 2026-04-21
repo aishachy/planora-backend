@@ -55,6 +55,48 @@ const getAllEvents = async () => {
     });
 };
 
+const getMyEvents = async (organizerId: string) => {
+    return await prisma.event.findMany({
+        where: {
+            organizerId,
+            isDeleted: false,
+        },
+        include: {
+            registrations: true,
+        },
+        orderBy: { date: "desc" },
+    });
+};
+
+const getEventParticipants = async (eventId: string) => {
+    // check if event exists & not deleted
+    const event = await prisma.event.findUnique({
+        where: { id: eventId },
+    });
+
+    if (!event || event.isDeleted) {
+        throw new Error("Event not found");
+    }
+
+    // get participants
+    const participants = await prisma.registration.findMany({
+        where: {
+            eventId,
+        },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                },
+            },
+        },
+    });
+
+    return participants;
+};
+
 const getEventById = async (id: string) => {
     const event = await prisma.event.findUnique({
         where: { id },
@@ -80,11 +122,14 @@ const getEventById = async (id: string) => {
     return event;
 };
 
-const updateEvent = async (id: string, data: Partial<EventInput>) => {
+const updateEvent = async (id: string, data: Partial<EventInput>, userId: string) => {
     const event = await getEventById(id);
 
     if (!event) {
         throw new Error("Event not found");
+    }
+    if (event.organizerId !== userId) {
+        throw new Error("Unauthorized");
     }
     return await prisma.event.update({
         where: { id },
@@ -108,20 +153,23 @@ const updateEvent = async (id: string, data: Partial<EventInput>) => {
 };
 
 const getFeaturedEvent = async () => {
-  const events = await prisma.event.findMany({
-    where: { isFeatured: true },
-  });
+    const events = await prisma.event.findMany({
+        where: { isFeatured: true },
+    });
 
-  console.log("FEATURED EVENTS:", events);
+    console.log("FEATURED EVENTS:", events);
 
-  return events;
+    return events;
 };
 
-const deleteEvent = async (id: string) => {
+const deleteEvent = async (id: string, userId: string) => {
     const event = await getEventById(id);
 
     if (!event) {
         throw new Error("Event not found");
+    }
+    if (event.organizerId !== userId) {
+        throw new Error("Unauthorized");
     }
     return await prisma.event.update({
         where: { id },
@@ -136,7 +184,9 @@ export const eventService = {
     createEvent,
     getAllEvents,
     getEventById,
+    getEventParticipants,
     updateEvent,
     getFeaturedEvent,
     deleteEvent,
+    getMyEvents
 };
