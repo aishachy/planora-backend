@@ -41,9 +41,16 @@ export const registerToEvent = async (req: Request, res: Response) => {
 export const getAllRegistrations = async (_req: Request, res: Response) => {
   try {
     const registrations = await registrationService.getAllRegistrations();
-    res.status(200).json({ success: true, data: registrations });
+
+    res.status(200).json({
+      success: true,
+      data: registrations,
+    });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
@@ -54,23 +61,8 @@ export const getMyRegistrations = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user?.id;
 
-    const registrations = await registrationService.getMyRegistrations(userId);
-
-    res.status(200).json({ success: true, data: registrations });
-  } catch (error: any) {
-    res.status(400).json({ success: false, message: error.message });
-  }
-};
-
-/* =====================================================
-   GET EVENT REGISTRATIONS (OWNER DASHBOARD)
-===================================================== */
-export const getEventRegistrations = async (req: Request, res: Response) => {
-  try {
-    const eventId = String(req.params.eventId);
-
     const registrations =
-      await registrationService.getEventRegistrations(eventId);
+      await registrationService.getMyRegistrations(userId);
 
     res.status(200).json({
       success: true,
@@ -85,11 +77,44 @@ export const getEventRegistrations = async (req: Request, res: Response) => {
 };
 
 /* =====================================================
-   APPROVE REGISTRATION (OWNER ONLY)
+   GET EVENT REGISTRATIONS (OWNER)
+   + optional ?status=PENDING
+===================================================== */
+export const getEventRegistrations = async (req: Request, res: Response) => {
+  try {
+    const eventId = Array.isArray(req.params.eventId)
+      ? req.params.eventId[0]
+      : req.params.eventId;
+    const ownerId = (req as any).user?.id;
+    const status = req.query.status as any;
+
+    const registrations =
+      await registrationService.getEventRegistrations(
+        eventId,
+        ownerId,
+        status
+      );
+
+    res.status(200).json({
+      success: true,
+      data: registrations,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/* =====================================================
+   APPROVE
 ===================================================== */
 export const approveRegistration = async (req: Request, res: Response) => {
   try {
-    const id  = String(req.params);
+    const id = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
     const ownerId = (req as any).user?.id;
 
     const updated = await registrationService.approveRegistration(
@@ -110,11 +135,13 @@ export const approveRegistration = async (req: Request, res: Response) => {
 };
 
 /* =====================================================
-   REJECT REGISTRATION (OWNER ONLY)
+   REJECT
 ===================================================== */
 export const rejectRegistration = async (req: Request, res: Response) => {
   try {
-    const id  = String(req.params);
+    const id = Array.isArray(req.params.id)
+  ? req.params.id[0]
+  : req.params.id;
     const ownerId = (req as any).user?.id;
 
     const updated = await registrationService.rejectRegistration(
@@ -135,7 +162,7 @@ export const rejectRegistration = async (req: Request, res: Response) => {
 };
 
 /* =====================================================
-   BAN PARTICIPANT (OWNER ONLY)
+   BAN
 ===================================================== */
 export const banParticipant = async (req: Request, res: Response) => {
   try {
@@ -168,11 +195,39 @@ export const banParticipant = async (req: Request, res: Response) => {
 };
 
 /* =====================================================
-   DELETE REGISTRATION
+   UNBAN (NEW)
+===================================================== */
+export const unbanParticipant = async (req: Request, res: Response) => {
+  try {
+    const { userId, eventId } = req.body;
+    const ownerId = (req as any).user?.id;
+
+    const result = await registrationService.unbanParticipant(
+      userId,
+      eventId,
+      ownerId
+    );
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+/* =====================================================
+   DELETE
 ===================================================== */
 export const deleteRegistration = async (req: Request, res: Response) => {
   try {
-    const id = String(req.params.id);
+    const id = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
 
     const deleted = await registrationService.deleteRegistration(id);
 

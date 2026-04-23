@@ -30,12 +30,12 @@ const registerToEvent = async (
     throw new Error("Event not found");
   }
 
-  // 🚫 Prevent owner registering own event
+  // Prevent owner registering own event
   if (event.organizerId === userId) {
     throw new Error("You cannot register for your own event");
   }
 
-  // 3. BLOCK CHECK (FIRST)
+  // 3. CHECK BLOCK FIRST
   const blocked = await prisma.registration.findFirst({
     where: {
       userId,
@@ -68,8 +68,14 @@ const registerToEvent = async (
     registrationStatus = RegistrationStatus.PENDING;
   }
 
-  // 6. HANDLE RE-APPLY (IMPORTANT FIX)
+  // 6. HANDLE EXISTING
   if (existing) {
+    //  Blocked users can NEVER reapply
+    if (existing.status === RegistrationStatus.BLOCKED) {
+      throw new Error("You are blocked from this event");
+    }
+
+    //  Allow reapply if rejected
     if (existing.status === RegistrationStatus.REJECTED) {
       return prisma.registration.update({
         where: {
@@ -103,7 +109,7 @@ const registerToEvent = async (
     throw new Error("Already registered for this event");
   }
 
-  // 7. CREATE NEW REGISTRATION
+  // 7. CREATE NEW
   return prisma.registration.create({
     data: {
       userId,
@@ -133,40 +139,74 @@ const registerToEvent = async (
 };
 
 /* =====================================================
-   GET ALL REGISTRATIONS
+   GET ALL REGISTRATIONS (ADMIN)
 ===================================================== */
 const getAllRegistrations = async () =>
   prisma.registration.findMany({
     include: {
       user: { select: { id: true, name: true, email: true, role: true } },
-      event: { select: { id: true, title: true, date: true, venue: true, fee: true } },
+      event: {
+        select: { id: true, title: true, date: true, venue: true, fee: true },
+      },
     },
   });
 
 /* =====================================================
-   GET MY REGISTRATIONS
+   GET MY REGISTRATIONS (USER)
 ===================================================== */
 const getMyRegistrations = async (userId: string) =>
   prisma.registration.findMany({
-    where: { userId },
+    where: {
+      userId,
+      event: {
+        isDeleted: false, 
+      },
+    },
     include: {
-      event: { select: { id: true, title: true, date: true, venue: true, fee: true } },
+      event: {
+        select: {
+          id: true,
+          title: true,
+          date: true,
+          venue: true,
+          fee: true,
+        },
+      },
     },
   });
 
 /* =====================================================
-   GET EVENT REGISTRATIONS (FOR OWNER DASHBOARD)
+   GET EVENT REGISTRATIONS (OWNER ONLY)
+   + FILTER BY STATUS
 ===================================================== */
-const getEventRegistrations = async (eventId: string) =>
-  prisma.registration.findMany({
-    where: { eventId },
+const getEventRegistrations = async (
+  eventId: string,
+  ownerId: string,
+  status?: RegistrationStatus
+) => {
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+  });
+
+  if (!event) throw new Error("Event not found");
+
+  if (event.organizerId !== ownerId) {
+    throw new Error("Not authorized");
+  }
+
+  return prisma.registration.findMany({
+    where: {
+      eventId,
+      ...(status && { status }),
+    },
     include: {
       user: { select: { id: true, name: true, email: true } },
     },
   });
+};
 
 /* =====================================================
-   APPROVE REGISTRATION (OWNER ONLY)
+   APPROVE REGISTRATION (OWNER)
 ===================================================== */
 const approveRegistration = async (id: string, ownerId: string) => {
   const registration = await prisma.registration.findUnique({
@@ -187,7 +227,7 @@ const approveRegistration = async (id: string, ownerId: string) => {
 };
 
 /* =====================================================
-   REJECT REGISTRATION (OWNER ONLY)
+   REJECT REGISTRATION (OWNER)
 ===================================================== */
 const rejectRegistration = async (id: string, ownerId: string) => {
   const registration = await prisma.registration.findUnique({
@@ -208,7 +248,7 @@ const rejectRegistration = async (id: string, ownerId: string) => {
 };
 
 /* =====================================================
-   BAN PARTICIPANT (OWNER ONLY)
+   BAN PARTICIPANT (OWNER)
 ===================================================== */
 const banParticipant = async (
   userId: string,
@@ -248,13 +288,41 @@ const banParticipant = async (
 };
 
 /* =====================================================
+   UNBAN PARTICIPANT (NEW)
+===================================================== */
+const unbanParticipant = async (
+  userId: string,
+  eventId: string,
+  ownerId: string
+) => {
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+  });
+
+  if (!event) throw new Error("Event not found");
+
+  if (event.organizerId !== ownerId) {
+    throw new Error("Not authorized");
+  }
+
+  return prisma.registration.update({
+    where: {
+      userId_eventId: { userId, eventId },
+    },
+    data: {
+      status: RegistrationStatus.REJECTED,
+    },
+  });
+};
+
+/* =====================================================
    DELETE REGISTRATION
 ===================================================== */
 const deleteRegistration = async (id: string) =>
   prisma.registration.delete({ where: { id } });
 
 /* =====================================================
-   EXPORT SERVICE
+   EXPORT
 ===================================================== */
 export const registrationService = {
   registerToEvent,
@@ -264,5 +332,6 @@ export const registrationService = {
   approveRegistration,
   rejectRegistration,
   banParticipant,
+  unbanParticipant, 
   deleteRegistration,
 };
