@@ -122,18 +122,45 @@ const getEventById = async (id: string) => {
     return event;
 };
 
-const updateEvent = async (id: string, data: Partial<EventInput>, userId: string) => {
+const updateEvent = async (
+    id: string,
+    data: Partial<EventInput>,
+    userId: string
+) => {
     const event = await getEventById(id);
 
     if (!event) {
         throw new Error("Event not found");
     }
+
     if (event.organizerId !== userId) {
         throw new Error("Unauthorized");
     }
+
+    // ✅ CLEAN DATA (VERY IMPORTANT)
+    const {
+        title,
+        description,
+        date,
+        time,
+        venue,
+        isPublic,
+        isPaid,
+        fee,
+    } = data;
+
     return await prisma.event.update({
         where: { id },
-        data,
+        data: {
+            title,
+            description,
+            date,
+            time,
+            venue,
+            isPublic,
+            isPaid,
+            fee,
+        },
         include: {
             organizer: {
                 select: {
@@ -143,8 +170,8 @@ const updateEvent = async (id: string, data: Partial<EventInput>, userId: string
                     role: true,
                     createdAt: true,
                     updatedAt: true,
-                    isDeleted: true
-                }
+                    isDeleted: true,
+                },
             },
             registrations: true,
             reviews: true,

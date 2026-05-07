@@ -1,156 +1,261 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
 import { eventService } from "./event.service.js";
+import { prisma } from "../../lib/prisma.js";
 
-
+/* =========================
+   CREATE EVENT
+========================= */
 const createEvent = async (req: Request, res: Response) => {
-    try {
-        const data = { ...req.body, organizerId: req.user!.id };
-        const result = await eventService.createEvent(data);
-        res.status(201).json({
-            success: true,
-            message: "Event created successfully",
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Event creation failed",
-        });
-    }
+  try {
+    const data = {
+      ...req.body,
+      organizerId: req.user!.id,
+    };
+
+    const result = await eventService.createEvent(data);
+
+    return res.status(201).json({
+      success: true,
+      message: "Event created successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    return res.status(400).json({
+      success: false,
+      message: error.message || "Event creation failed",
+    });
+  }
 };
 
+/* =========================
+   GET ALL EVENTS
+========================= */
 const getAllEvents = async (_req: Request, res: Response) => {
-    try {
-        const result = await eventService.getAllEvents();
-        res.status(200).json({
-            success: true,
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Events retrieval failed",
-        });
-    }
-}
+  try {
+    const result = await eventService.getAllEvents();
 
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error: any) {
+    return res.status(400).json({
+      success: false,
+      message: error.message || "Events retrieval failed",
+    });
+  }
+};
+
+/* =========================
+   GET MY EVENTS
+========================= */
 const getMyEvents = async (req: Request, res: Response) => {
-    try {
-        const userId = req.user!.id;
+  try {
+    const userId = req.user!.id;
 
-        const result = await eventService.getMyEvents(userId);
+    const result = await eventService.getMyEvents(userId);
 
-        res.status(200).json({
-            success: true,
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message,
-        });
-    }
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error: any) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
+/* =========================
+   GET EVENT BY ID
+========================= */
 const getEventById = async (req: Request, res: Response) => {
-    try {
-        const eventId = String(req.params.id);
-        const result = await eventService.getEventById(eventId);
-        res.status(200).json({
-            success: true,
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Events retrieval failed",
-        });
-    }
+  try {
+    const id =
+      typeof req.params.id === "string"
+        ? req.params.id
+        : req.params.id?.[0];
+
+    const result = await eventService.getEventById(id);
+
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error: any) {
+    return res.status(400).json({
+      success: false,
+      message: error.message || "Event retrieval failed",
+    });
+  }
 };
 
+/* =========================
+   GET PARTICIPANTS
+========================= */
 const getEventParticipants = async (req: Request, res: Response) => {
-    try {
-        const eventId = String(req.params.id);
+  try {
+    const id =
+      typeof req.params.id === "string"
+        ? req.params.id
+        : req.params.id?.[0];
 
-        const result = await eventService.getEventParticipants(eventId);
+    const result = await eventService.getEventParticipants(id);
 
-        res.status(200).json({
-            success: true,
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Failed to get participants",
-        });
-    }
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error: any) {
+    return res.status(400).json({
+      success: false,
+      message: error.message || "Failed to get participants",
+    });
+  }
 };
 
+/* =========================
+   UPDATE EVENT
+========================= */
 const updateEvent = async (req: Request, res: Response) => {
-    try {
-        const eventId = String(req.params.id);
-        const result = await eventService.updateEvent(eventId, req.body, req.user!.id);
-        res.status(200).json({
-            success: true,
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Events retrieval failed",
-        });
+  try {
+    const id =
+      typeof req.params.id === "string"
+        ? req.params.id
+        : req.params.id?.[0];
+
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
     }
+
+    const event = await prisma.event.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        organizerId: true,
+      },
+    });
+
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: "Event not found",
+      });
+    }
+
+    if (event.organizerId !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not allowed to update this event",
+      });
+    }
+
+    // 🧹 CLEAN DATA (IMPORTANT)
+    const {
+      title,
+      description,
+      date,
+      time,
+      venue,
+      isPublic,
+      isPaid,
+      fee,
+    } = req.body;
+
+    const updatedEvent = await prisma.event.update({
+      where: { id },
+      data: {
+        title,
+        description,
+        date,
+        time,
+        venue,
+        isPublic,
+        isPaid,
+        fee,
+      },
+      include: {
+        organizer: true,
+        registrations: true,
+        reviews: true,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Event updated successfully",
+      data: updatedEvent,
+    });
+  } catch (error: any) {
+    console.error("UPDATE EVENT ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
+    });
+  }
 };
 
-const getFeaturedEvent = async (req: Request, res: Response) => {
-    console.log("🔥 FEATURED EVENT API HIT");
-    try {
-        const events = await eventService.getFeaturedEvent();
+/* =========================
+   FEATURED EVENTS
+========================= */
+const getFeaturedEvent = async (_req: Request, res: Response) => {
+  try {
+    const events = await eventService.getFeaturedEvent();
 
-        if (!events || events.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "No featured events found",
-                data: [],
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            data: events,
-        });
-    } catch (err: any) {
-        return res.status(500).json({
-            success: false,
-            message: err.message,
-        });
-    }
+    return res.status(200).json({
+      success: true,
+      data: events || [],
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
+/* =========================
+   DELETE EVENT
+========================= */
 const deleteEvent = async (req: Request, res: Response) => {
-    try {
-        const eventId = String(req.params.id);
-        const result = await eventService.deleteEvent(eventId, req.user!.id);
-        res.status(200).json({
-            success: true,
-            data: result,
-        });
-    } catch (error: any) {
-        res.status(400).json({
-            success: false,
-            message: error.message || "Events deletion failed",
-        });
-    }
+  try {
+    const id =
+      typeof req.params.id === "string"
+        ? req.params.id
+        : req.params.id?.[0];
+
+    const result = await eventService.deleteEvent(id, req.user!.id);
+
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error: any) {
+    return res.status(400).json({
+      success: false,
+      message: error.message || "Event deletion failed",
+    });
+  }
 };
 
+/* =========================
+   EXPORT
+========================= */
 export const eventController = {
-    createEvent,
-    getAllEvents,
-    getEventById,
-    getEventParticipants,
-    updateEvent,
-    getFeaturedEvent,
-    deleteEvent,
-    getMyEvents
+  createEvent,
+  getAllEvents,
+  getEventById,
+  getEventParticipants,
+  updateEvent,
+  getFeaturedEvent,
+  deleteEvent,
+  getMyEvents,
 };

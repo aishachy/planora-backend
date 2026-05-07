@@ -64,6 +64,7 @@ const updateReview = async (req: Request, res: Response) => {
 
         const result = await ReviewService.updateReview(
             reviewId,
+            req.user!.id,
             req.body
         );
 
@@ -84,7 +85,7 @@ const deleteReview = async (req: Request, res: Response) => {
     try {
         const reviewId = String(req.params.id);
 
-        const result = await ReviewService.deleteReview(reviewId);
+        const result = await ReviewService.deleteReview(reviewId, req.user!.id);
 
         res.status(200).json({
             success: true,
