@@ -1,7 +1,7 @@
 import { prisma } from "../../lib/prisma.js";
 
 export const ReviewService = {
-  // Create Review
+  // CREATE REVIEW
   createReview: async (payload: {
     rating: number;
     comment: string;
@@ -10,30 +10,29 @@ export const ReviewService = {
   }) => {
     const { rating, comment, userId, eventId } = payload;
 
-    if (!rating || rating < 1 || rating > 5) {
+    // ✅ rating validation
+    if (typeof rating !== "number" || rating < 1 || rating > 5) {
       throw new Error("Rating must be between 1 and 5");
     }
 
+    // ✅ safe comment validation
     if (!comment || comment.trim().length < 3) {
       throw new Error("Comment must be at least 3 characters");
     }
 
-    // Optional: prevent duplicate review per user per event
+    // ❌ prevent duplicate review
     const existing = await prisma.review.findFirst({
-      where: {
-        userId,
-        eventId,
-      },
+      where: { userId, eventId },
     });
 
     if (existing) {
       throw new Error("You already reviewed this event");
     }
 
-    const review = await prisma.review.create({
+    return prisma.review.create({
       data: {
         rating,
-        comment,
+        comment: comment.trim(),
         userId,
         eventId,
       },
@@ -53,130 +52,126 @@ export const ReviewService = {
         },
       },
     });
-
-    return review;
   },
 
-  // Get all reviews
+  // GET ALL REVIEWS
   getAllReviews: async () => {
     return prisma.review.findMany({
       include: {
         user: {
-          select: { id: true, name: true, email: true, role: true, createdAt: true, updatedAt: true },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            createdAt: true,
+            updatedAt: true,
+          },
         },
         event: {
-          select: { id: true, title: true, date: true, venue: true, fee: true, createdAt: true, updatedAt: true },
+          select: {
+            id: true,
+            title: true,
+            date: true,
+            venue: true,
+            fee: true,
+          },
         },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
     });
   },
 
-  // Get reviews by event
+  // GET BY EVENT
   getReviewsByEvent: async (eventId: string) => {
+    if (!eventId) throw new Error("Event ID is required");
+
     return prisma.review.findMany({
       where: { eventId },
       include: {
         user: {
-          select: { id: true, name: true, email: true, role: true, createdAt: true, updatedAt: true },
+          select: {
+            id: true,
+            name: true,
+          },
         },
       },
-      orderBy: {
-        createdAt: "desc",
+      orderBy: { createdAt: "desc" },
+    });
+  },
+
+  // UPDATE REVIEW
+  updateReview: async (
+    id: string,
+    userId: string,
+    payload: { rating?: number; comment?: string }
+  ) => {
+    const review = await prisma.review.findUnique({ where: { id } });
+
+    if (!review) throw new Error("Review not found");
+
+    if (review.userId !== userId) {
+      throw new Error("You are not authorized to update this review");
+    }
+
+    if (payload.rating !== undefined) {
+      if (payload.rating < 1 || payload.rating > 5) {
+        throw new Error("Rating must be between 1 and 5");
+      }
+    }
+
+    if (payload.comment !== undefined) {
+      if (payload.comment.trim().length < 3) {
+        throw new Error("Comment must be at least 3 characters");
+      }
+    }
+
+    return prisma.review.update({
+      where: { id },
+      data: {
+        ...payload,
+        comment: payload.comment?.trim(),
       },
     });
   },
 
-  // Update review
-  updateReview: async (
-    id: string, userId: string, payload: { rating?: number; comment?: string; }) => {
-    const existingReview = await prisma.review.findUnique({
-      where: { id },
-    });
-
-    if (!existingReview) {
-      throw new Error("Review not found");
-    }
-
-    if (existingReview.userId !== userId) {
-      throw new Error("You are not authorized to update this review");
-    }
-    if (
-      payload.rating !== undefined &&
-      (payload.rating < 1 || payload.rating > 5)
-    ) {
-      throw new Error("Rating must be between 1 and 5");
-    }
-
-    //  Validate comment if provided
-    if (
-      payload.comment !== undefined &&
-      payload.comment.trim().length < 3
-    ) {
-      throw new Error("Comment must be at least 3 characters");
-    }
-
-    const review = await prisma.review.update({
-      where: { id },
-      data: payload,
-    });
-
-    return review;
-  },
-
-  // ✅ Delete review
+  // DELETE REVIEW
   deleteReview: async (id: string, userId: string) => {
-    // Find review
-    const review = await prisma.review.findUnique({
-      where: { id },
-    });
+    const review = await prisma.review.findUnique({ where: { id } });
 
-    // Check review exists
-    if (!review) {
-      throw new Error("Review not found");
-    }
+    if (!review) throw new Error("Review not found");
 
-    // Check ownership
     if (review.userId !== userId) {
       throw new Error("Unauthorized");
     }
 
-    // Check delete time limit (24 hours)
+    // optional time restriction (safe now)
     const createdAt = new Date(review.createdAt).getTime();
     const now = Date.now();
-
     const diffHours = (now - createdAt) / (1000 * 60 * 60);
 
     if (diffHours > 24) {
-      throw new Error("Review delete period expired");
+      throw new Error("Review delete period expired (24h limit)");
     }
 
-    // Delete review
-    await prisma.review.delete({
+    return prisma.review.delete({
       where: { id },
     });
-
-    return {
-      message: "Review deleted successfully",
-    };
   },
 
-
+  // STATS
   getEventRatingStats: async (eventId: string) => {
-    const avg = await prisma.review.aggregate({
+    if (!eventId) throw new Error("Event ID is required");
+
+    const stats = await prisma.review.aggregate({
       where: { eventId },
-      _avg: {
-        rating: true,
-      },
+      _avg: { rating: true },
       _count: true,
     });
 
     return {
-      averageRating: avg._avg.rating || 0,
-      totalReviews: avg._count,
+      averageRating: stats._avg.rating || 0,
+      totalReviews: stats._count,
     };
   },
 };
-
