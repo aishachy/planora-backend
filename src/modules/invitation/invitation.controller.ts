@@ -68,9 +68,33 @@ const rejectInvitation = async (req: Request, res: Response) => {
   });
 };
 
+const payAndAccept = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const invitationId = String(req.params.id);
+
+    const data = await invitationService.payAndAcceptInvitation(
+      invitationId,
+      userId
+    );
+
+    res.json({
+      success: true,
+      message: "Payment successful & invitation accepted",
+      data,
+    });
+  } catch (err: any) {
+    res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
 export const invitationController = {
   sendInvitation,
   getMyInvitations,
   acceptInvitation,
   rejectInvitation,
+  payAndAccept,
 };
