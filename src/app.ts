@@ -8,6 +8,7 @@ import { paymentRouter } from "./modules/payment/payment.router.js";
 import { adminRouter } from "./modules/admin/admin.router.js";
 import { registrationRouter } from "./modules/registration/registration.router.js";
 import cors from "cors";
+import { invitationRouter } from "./modules/invitation/invitation.router.js";
 
 const app = express();
 
@@ -35,6 +36,8 @@ app.use('/api/registration', registrationRouter)
 app.use('/api/review', reviewRouter)
 
 app.use('/api/admin', adminRouter)
+
+app.use('/api/invitation', invitationRouter)
 
 
 
