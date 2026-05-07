@@ -5,7 +5,7 @@ import auth from "../../middleware/auth.js";
 const router = Router();
 
 router.post("/", auth("ADMIN", "USER"), reviewController.createReview);
-router.get("/", auth("ADMIN", "USER"), reviewController.getAllReviews);
+router.get("/", reviewController.getAllReviews);
 router.get("/event/:eventId", reviewController.getReviewsByEvent);
 router.patch("/:id", auth("ADMIN", "USER"), reviewController.updateReview);
 router.delete("/:id", auth("ADMIN", "USER"), reviewController.deleteReview);
