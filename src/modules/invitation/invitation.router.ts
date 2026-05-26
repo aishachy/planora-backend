@@ -7,7 +7,6 @@ const router = express.Router();
 
 router.post("/", auth("ADMIN", "USER"), invitationController.sendInvitation);
 router.post("/pay/:id", auth("ADMIN", "USER"), invitationController.payAndAccept);
-router.post("/pay/:id", auth("ADMIN", "USER"), invitationController.payAndAccept);
 router.get("/me", auth("ADMIN", "USER"), invitationController.getMyInvitations);
 router.patch("/:id/accept", auth("ADMIN", "USER"), invitationController.acceptInvitation);
 router.patch("/:id/reject", auth("ADMIN", "USER"), invitationController.rejectInvitation);
