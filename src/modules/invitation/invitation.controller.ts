@@ -39,6 +39,35 @@ const getMyInvitations = async (req: Request, res: Response) => {
   });
 };
 
+const getSentInvitations = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const userId = req.user?.id; // from auth middleware
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const result =
+      await invitationService.getSentInvitations(userId);
+
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 const acceptInvitation = async (req: Request, res: Response) => {
   const userId = req.user!.id;
 
@@ -96,6 +125,7 @@ const payAndAccept = async (req: Request, res: Response) => {
 export const invitationController = {
   sendInvitation,
   getMyInvitations,
+  getSentInvitations,
   acceptInvitation,
   rejectInvitation,
   payAndAccept,

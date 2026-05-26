@@ -72,7 +72,11 @@ const getMyInvitations = async (
   userId: string
 ) => {
   return prisma.invitation.findMany({
-    where: { userId },
+    where: {
+      event: {
+        organizerId: userId,
+      }
+    },
 
     select: {
       id: true,
@@ -81,6 +85,7 @@ const getMyInvitations = async (
 
       event: {
         select: {
+          
           id: true,
           title: true,
           date: true,
@@ -91,6 +96,37 @@ const getMyInvitations = async (
       },
     },
 
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
+const getSentInvitations = async (userId: string) => {
+  return prisma.invitation.findMany({
+    where: {
+      event: {
+        organizerId: userId,
+      },
+    },
+    select: {
+      id: true,
+      status: true,
+      createdAt: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      event: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
+    },
     orderBy: {
       createdAt: "desc",
     },
@@ -292,6 +328,7 @@ const payAndAcceptInvitation = async (
 export const invitationService = {
   sendInvitation,
   getMyInvitations,
+  getSentInvitations,
   acceptInvitation,
   rejectInvitation,
   payAndAcceptInvitation,
