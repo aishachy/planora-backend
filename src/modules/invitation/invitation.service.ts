@@ -56,13 +56,27 @@ const sendInvitation = async (
     );
   }
 
+  let status = prisma.invitationStatus.PENDING;
+
+  if (event.isPublic && event.isPaid) {
+    status = prisma.invitationStatus.PENDING_PAYMENT;
+  }
+
+  if (!event.isPublic && event.isPaid) {
+    status = prisma.invitationStatus.PENDING_PAYMENT_APPROVAL;
+  }
+
+  if (!event.isPublic && !event.isPaid) {
+    status = prisma.invitationStatus.PENDING;
+  }
+
   // CREATE INVITATION
   return prisma.invitation.create({
     data: {
       eventId,
       userId,
       inviterId,
-      status: "PENDING",
+      status,
     },
   });
 };
@@ -80,12 +94,12 @@ const getMyInvitations = async (
 
     select: {
       id: true,
-      status: true, 
+      status: true,
       createdAt: true,
 
       event: {
         select: {
-          
+
           id: true,
           title: true,
           date: true,

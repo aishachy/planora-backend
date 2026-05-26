@@ -28,6 +28,30 @@ const sendInvitation = async (req: Request, res: Response) => {
   }
 };
 
+export const acceptInvitationController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const invitationId = Array.isArray(id) ? id[0] : id;
+
+    const userId = req.user!.id;
+
+    const result = await invitationService.acceptInvitation(
+      invitationId,
+      userId
+    );
+
+    return res.json({
+      success: true,
+      data: result,
+    });
+  } catch (error: any) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 const getMyInvitations = async (req: Request, res: Response) => {
   const userId = req.user!.id;
 
