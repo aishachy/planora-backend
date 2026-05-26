@@ -7,10 +7,12 @@ const sendInvitation = async (req: Request, res: Response) => {
     const inviterId = req.user!.id;
     const { eventId, userId } = req.body;
 
+    const inviterRole = req.user!.role;
     const data = await invitationService.sendInvitation(
       eventId,
       userId,
-      inviterId
+      inviterId,
+      inviterRole
     );
 
     res.status(201).json({

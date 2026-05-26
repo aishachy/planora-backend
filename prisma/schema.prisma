@@ -13,17 +13,18 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  name      String
-  email     String    @unique
-  password  String
-  role      Role      @default(USER)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-  isBanned  Boolean   @default(false)
-  bannedAt  DateTime?
+  id              String       @id @default(uuid())
+  name            String
+  email           String       @unique
+  password        String
+  role            Role         @default(USER)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  isDeleted       Boolean      @default(false)
+  deletedAt       DateTime?
+  isBanned        Boolean      @default(false)
+  bannedAt        DateTime?
+  invitationsSent Invitation[] @relation("Inviter")
 
   events        Event[]
   registrations Registration[]
@@ -114,16 +115,18 @@ model Review {
 }
 
 model Invitation {
-  id      String           @id @default(uuid())
-  eventId String
-  userId  String
-  status  InvitationStatus @default(PENDING)
+  id        String           @id @default(uuid())
+  eventId   String
+  userId    String
+  inviterId String
+  status    InvitationStatus @default(PENDING)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  event Event @relation(fields: [eventId], references: [id])
-  user  User  @relation(fields: [userId], references: [id])
+  event   Event @relation(fields: [eventId], references: [id])
+  user    User  @relation(fields: [userId], references: [id])
+  inviter User  @relation("Inviter", fields: [inviterId], references: [id])
 
   @@unique([eventId, userId])
 }

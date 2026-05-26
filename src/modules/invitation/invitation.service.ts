@@ -4,7 +4,8 @@ import { prisma } from "../../app/lib/prisma.js";
 const sendInvitation = async (
   eventId: string,
   userId: string,
-  inviterId: string
+  inviterId: string,
+  inviterRole: string // pass the role as a parameter
 ) => {
   // CHECK EVENT
   const event = await prisma.event.findUnique({
@@ -16,7 +17,10 @@ const sendInvitation = async (
   }
 
   // ONLY ORGANIZER CAN INVITE
-  if (event.organizerId !== inviterId) {
+  if (
+    event.organizerId !== inviterId &&
+    inviterRole !== "ADMIN"
+  ) {
     throw new Error(
       "Only organizer can invite"
     );
@@ -57,6 +61,7 @@ const sendInvitation = async (
     data: {
       eventId,
       userId,
+      inviterId,
       status: "PENDING",
     },
   });
