@@ -75,7 +75,16 @@ const getMyInvitations = async (
     where: { userId },
 
     include: {
-      event: true,
+      event: {
+        select: {
+          id: true,
+          title: true,
+          date: true,
+          venue: true,
+          isPaid: true,
+          fee: true,
+        },
+      },
     },
 
     orderBy: {
