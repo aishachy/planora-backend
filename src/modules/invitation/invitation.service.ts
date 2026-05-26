@@ -74,7 +74,11 @@ const getMyInvitations = async (
   return prisma.invitation.findMany({
     where: { userId },
 
-    include: {
+    select: {
+      id: true,
+      status: true, 
+      createdAt: true,
+
       event: {
         select: {
           id: true,
