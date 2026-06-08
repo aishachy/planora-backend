@@ -1,5 +1,13 @@
 import { prisma } from "../../app/lib/prisma.js";
 
+enum InvitationStatus {
+  PENDING = "PENDING",
+  PENDING_PAYMENT = "PENDING_PAYMENT",
+  PENDING_PAYMENT_APPROVAL = "PENDING_PAYMENT_APPROVAL",
+  ACCEPTED = "ACCEPTED",
+  REJECTED = "REJECTED",
+}
+
 // SEND INVITATION
 const sendInvitation = async (
   eventId: string,
@@ -56,18 +64,18 @@ const sendInvitation = async (
     );
   }
 
-  let status = prisma.invitationStatus.PENDING;
+  let status: InvitationStatus = InvitationStatus.PENDING;
 
   if (event.isPublic && event.isPaid) {
-    status = prisma.invitationStatus.PENDING_PAYMENT;
+    status = InvitationStatus.PENDING_PAYMENT;
   }
 
   if (!event.isPublic && event.isPaid) {
-    status = prisma.invitationStatus.PENDING_PAYMENT_APPROVAL;
+    status = InvitationStatus.PENDING_PAYMENT_APPROVAL;
   }
 
   if (!event.isPublic && !event.isPaid) {
-    status = prisma.invitationStatus.PENDING;
+    status = InvitationStatus.PENDING;
   }
 
   // CREATE INVITATION
