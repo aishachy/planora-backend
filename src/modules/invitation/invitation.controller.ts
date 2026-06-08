@@ -68,7 +68,8 @@ const getSentInvitations = async (
   res: Response
 ) => {
   try {
-    const userId = req.user?.id; // from auth middleware
+    const userId = req.user!.id; 
+    const eventId = req.query.eventId as string | undefined;
 
     if (!userId) {
       return res.status(401).json({
@@ -78,7 +79,7 @@ const getSentInvitations = async (
     }
 
     const result =
-      await invitationService.getSentInvitations(userId);
+      await invitationService.getSentInvitations(userId, eventId!);
 
     return res.status(200).json({
       success: true,

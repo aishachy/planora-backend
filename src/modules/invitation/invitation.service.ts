@@ -119,17 +119,17 @@ const getMyInvitations = async (userId: string) => {
   });
 };
 
-const getSentInvitations = async (userId: string) => {
+const getSentInvitations = async (userId: string, eventId: string) => {
   return prisma.invitation.findMany({
     where: {
-      event: {
-        organizerId: userId,
-      },
+      inviterId: userId,
+      eventId: eventId
     },
     select: {
       id: true,
       status: true,
       createdAt: true,
+
       user: {
         select: {
           id: true,
@@ -137,6 +137,7 @@ const getSentInvitations = async (userId: string) => {
           email: true,
         },
       },
+
       event: {
         select: {
           id: true,
