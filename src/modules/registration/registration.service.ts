@@ -159,7 +159,7 @@ const getMyRegistrations = async (userId: string) =>
     where: {
       userId,
       event: {
-        isDeleted: false, 
+        isDeleted: false,
       },
     },
     include: {
@@ -220,10 +220,24 @@ const approveRegistration = async (id: string, ownerId: string) => {
     throw new Error("Not authorized");
   }
 
-  return prisma.registration.update({
+  const updated = await prisma.registration.update({
     where: { id },
-    data: { status: RegistrationStatus.APPROVED },
+    data: {
+      status: RegistrationStatus.APPROVED,
+    },
   });
+
+  await prisma.invitation.updateMany({
+    where: {
+      eventId: registration.eventId,
+      userId: registration.userId,
+    },
+    data: {
+      status: "ACCEPTED",
+    },
+  });
+
+  return updated;
 };
 
 /* =====================================================
@@ -241,10 +255,24 @@ const rejectRegistration = async (id: string, ownerId: string) => {
     throw new Error("Not authorized");
   }
 
-  return prisma.registration.update({
+  const updated = await prisma.registration.update({
     where: { id },
-    data: { status: RegistrationStatus.REJECTED },
+    data: {
+      status: RegistrationStatus.REJECTED,
+    },
   });
+
+  await prisma.invitation.updateMany({
+    where: {
+      eventId: registration.eventId,
+      userId: registration.userId,
+    },
+    data: {
+      status: "REJECTED",
+    },
+  });
+
+  return updated;
 };
 
 /* =====================================================
@@ -332,6 +360,6 @@ export const registrationService = {
   approveRegistration,
   rejectRegistration,
   banParticipant,
-  unbanParticipant, 
+  unbanParticipant,
   deleteRegistration,
 };

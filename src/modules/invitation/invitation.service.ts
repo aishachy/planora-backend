@@ -208,11 +208,12 @@ const acceptInvitation = async (
   }
 
   // CREATE REGISTRATION
+  // CREATE REGISTRATION
   await prisma.registration.create({
     data: {
       userId,
       eventId: invitation.eventId,
-      status: "APPROVED",
+      status: "PENDING",
     },
   });
 
@@ -221,7 +222,7 @@ const acceptInvitation = async (
     where: { id: invitationId },
 
     data: {
-      status: "ACCEPTED",
+      status: "PENDING_PAYMENT_APPROVAL",
     },
   });
 };
@@ -249,7 +250,10 @@ const rejectInvitation = async (
   }
 
   // PREVENT DOUBLE ACTION
-  if (invitation.status !== "PENDING") {
+  if (
+    invitation.status !== "PENDING_PAYMENT" &&
+    invitation.status !== "PENDING_PAYMENT_APPROVAL"
+  ) {
     throw new Error(
       "Invitation already processed"
     );
