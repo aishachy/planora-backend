@@ -33,8 +33,27 @@ const createEvent = async (data: EventInput) => {
     });
 };
 
+const getParticipationType = (event: {
+    isPublic: boolean;
+    isPaid: boolean;
+}) => {
+    if (event.isPublic && !event.isPaid) {
+        return "FREE_PUBLIC";
+    }
+
+    if (event.isPublic && event.isPaid) {
+        return "PAID_PUBLIC";
+    }
+
+    if (!event.isPublic && !event.isPaid) {
+        return "PRIVATE_FREE";
+    }
+
+    return "PRIVATE_PAID";
+};
+
 const getAllEvents = async () => {
-    return await prisma.event.findMany({
+    const events = await prisma.event.findMany({
         where: { isDeleted: false },
         include: {
             organizer: {
@@ -45,18 +64,25 @@ const getAllEvents = async () => {
                     role: true,
                     createdAt: true,
                     updatedAt: true,
-                    isDeleted: true
-                }
+                    isDeleted: true,
+                },
             },
             registrations: true,
             reviews: true,
         },
-        orderBy: { date: "asc" },
+        orderBy: {
+            date: "asc",
+        },
     });
+
+    return events.map((event) => ({
+        ...event,
+        participationType: getParticipationType(event),
+    }));
 };
 
 const getMyEvents = async (organizerId: string) => {
-    return await prisma.event.findMany({
+    const events = await prisma.event.findMany({
         where: {
             organizerId,
             isDeleted: false,
@@ -66,6 +92,11 @@ const getMyEvents = async (organizerId: string) => {
         },
         orderBy: { date: "desc" },
     });
+
+    return events.map((event) => ({
+        ...event,
+        participationType: getParticipationType(event),
+    }));
 };
 
 const getEventParticipants = async (eventId: string) => {
@@ -119,7 +150,10 @@ const getEventById = async (id: string) => {
     if (!event || event.isDeleted) {
         return null;
     }
-    return event;
+    return {
+        ...event,
+        participationType: getParticipationType(event),
+    }
 };
 
 const updateEvent = async (
@@ -207,6 +241,44 @@ const deleteEvent = async (id: string, userId: string) => {
     });
 };
 
+const getParticipationStatus = async (eventId: string, userId: string) => {
+    const event = await prisma.event.findUnique({
+        where: { id: eventId },
+    });
+
+    if (!event) throw new Error("Event not found");
+
+    const registration = await prisma.registration.findFirst({
+        where: {
+            eventId,
+            userId,
+        },
+    });
+
+    // FREE PUBLIC → join instantly
+    if (event.isPublic && !event.isPaid) {
+        return registration ? "JOINED" : "CAN_JOIN";
+    }
+
+    // PAID PUBLIC → payment required
+    if (event.isPublic && event.isPaid) {
+        return registration ? "REGISTERED" : "PAYMENT_REQUIRED";
+    }
+
+    // PRIVATE FREE → request join
+    if (!event.isPublic && !event.isPaid) {
+        return registration ? "JOINED" : "REQUEST_REQUIRED";
+    }
+
+    // PRIVATE PAID → payment + approval
+    if (!event.isPublic && event.isPaid) {
+        return registration ? "PENDING_APPROVAL" : "PAYMENT_REQUIRED";
+    }
+
+    return "UNKNOWN";
+};
+
+
 export const eventService = {
     createEvent,
     getAllEvents,
@@ -215,5 +287,7 @@ export const eventService = {
     updateEvent,
     getFeaturedEvent,
     deleteEvent,
-    getMyEvents
+    getMyEvents,
+    getParticipationStatus,
+    getParticipationType
 };

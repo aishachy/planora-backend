@@ -10,6 +10,7 @@ router.get("/myEvent", auth("ADMIN", "USER"), eventController.getMyEvents);
 router.get("/:id/participants", auth("ADMIN", "USER"), eventController.getEventParticipants);
 router.get("/featured", eventController.getFeaturedEvent);
 router.get("/:id", eventController.getEventById);
+router.get("/:id/participation-status", eventController.getParticipationStatus);
 router.put("/:id", auth("ADMIN", "USER"), eventController.updateEvent);
 router.delete("/:id", auth("ADMIN", "USER"), eventController.deleteEvent);
 

@@ -73,10 +73,14 @@ const getMyEvents = async (req: Request, res: Response) => {
 ========================= */
 const getEventById = async (req: Request, res: Response) => {
   try {
-    const id =
-      typeof req.params.id === "string"
-        ? req.params.id
-        : req.params.id?.[0];
+    const id = String(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Event ID is required",
+      });
+    }
 
     const result = await eventService.getEventById(id);
 
@@ -97,10 +101,14 @@ const getEventById = async (req: Request, res: Response) => {
 ========================= */
 const getEventParticipants = async (req: Request, res: Response) => {
   try {
-    const id =
-      typeof req.params.id === "string"
-        ? req.params.id
-        : req.params.id?.[0];
+    const id = String(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Event ID is required",
+      });
+    }
 
     const result = await eventService.getEventParticipants(id);
 
@@ -121,17 +129,13 @@ const getEventParticipants = async (req: Request, res: Response) => {
 ========================= */
 const updateEvent = async (req: Request, res: Response) => {
   try {
-    const id =
-      typeof req.params.id === "string"
-        ? req.params.id
-        : req.params.id?.[0];
-
+    const id = String(req.params.id);
     const userId = req.user?.id;
 
-    if (!userId) {
-      return res.status(401).json({
+    if (!id || !userId) {
+      return res.status(400).json({
         success: false,
-        message: "Unauthorized",
+        message: "Missing required data",
       });
     }
 
@@ -157,30 +161,9 @@ const updateEvent = async (req: Request, res: Response) => {
       });
     }
 
-    // 🧹 CLEAN DATA (IMPORTANT)
-    const {
-      title,
-      description,
-      date,
-      time,
-      venue,
-      isPublic,
-      isPaid,
-      fee,
-    } = req.body;
-
     const updatedEvent = await prisma.event.update({
       where: { id },
-      data: {
-        title,
-        description,
-        date,
-        time,
-        venue,
-        isPublic,
-        isPaid,
-        fee,
-      },
+      data: req.body,
       include: {
         organizer: true,
         registrations: true,
@@ -194,8 +177,6 @@ const updateEvent = async (req: Request, res: Response) => {
       data: updatedEvent,
     });
   } catch (error: any) {
-    console.error("UPDATE EVENT ERROR:", error);
-
     return res.status(500).json({
       success: false,
       message: error.message || "Internal server error",
@@ -227,10 +208,14 @@ const getFeaturedEvent = async (_req: Request, res: Response) => {
 ========================= */
 const deleteEvent = async (req: Request, res: Response) => {
   try {
-    const id =
-      typeof req.params.id === "string"
-        ? req.params.id
-        : req.params.id?.[0];
+    const id = String(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Event ID is required",
+      });
+    }
 
     const result = await eventService.deleteEvent(id, req.user!.id);
 
@@ -247,6 +232,31 @@ const deleteEvent = async (req: Request, res: Response) => {
 };
 
 /* =========================
+   PARTICIPATION STATUS
+========================= */
+const getParticipationStatus = async (req: Request, res: Response) => {
+  try {
+    const eventId = String(req.params.id);
+    const userId = req.user!.id;
+
+    const status = await eventService.getParticipationStatus(
+      eventId,
+      userId
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: status,
+    });
+  } catch (err: any) {
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+/* =========================
    EXPORT
 ========================= */
 export const eventController = {
@@ -258,4 +268,5 @@ export const eventController = {
   getFeaturedEvent,
   deleteEvent,
   getMyEvents,
+  getParticipationStatus,
 };
