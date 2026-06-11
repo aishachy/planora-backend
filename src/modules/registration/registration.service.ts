@@ -60,11 +60,22 @@ const registerToEvent = async (
 
   if (status) {
     registrationStatus = status;
-  } else if (!event.isPublic) {
-    registrationStatus = RegistrationStatus.PENDING;
   } else if (event.isPublic && !event.isPaid) {
     registrationStatus = RegistrationStatus.APPROVED;
-  } else {
+  }
+
+  // Public Paid
+  else if (event.isPublic && event.isPaid) {
+    registrationStatus = RegistrationStatus.PENDING;
+  }
+
+  // Private Free
+  else if (!event.isPublic && !event.isPaid) {
+    registrationStatus = RegistrationStatus.PENDING;
+  }
+
+  // Private Paid
+  else {
     registrationStatus = RegistrationStatus.PENDING;
   }
 

@@ -63,15 +63,15 @@ const sendInvitation = async (
       "User already registered"
     );
   }
-
+ 
   let status: InvitationStatus = InvitationStatus.PENDING;
 
   if (event.isPublic && event.isPaid) {
     status = InvitationStatus.PENDING_PAYMENT;
   }
 
-  if (!event.isPublic && event.isPaid) {
-    status = InvitationStatus.PENDING_PAYMENT_APPROVAL;
+  if (event.isPaid) {
+    status = InvitationStatus.PENDING_PAYMENT;
   }
 
   if (!event.isPublic && !event.isPaid) {
@@ -208,21 +208,18 @@ const acceptInvitation = async (
   }
 
   // CREATE REGISTRATION
-  // CREATE REGISTRATION
   await prisma.registration.create({
     data: {
       userId,
       eventId: invitation.eventId,
-      status: "PENDING",
+      status: "APPROVED",
     },
   });
 
-  // UPDATE INVITATION
   return prisma.invitation.update({
     where: { id: invitationId },
-
     data: {
-      status: "PENDING_PAYMENT_APPROVAL",
+      status: "ACCEPTED",
     },
   });
 };
@@ -251,12 +248,10 @@ const rejectInvitation = async (
 
   // PREVENT DOUBLE ACTION
   if (
-    invitation.status !== "PENDING_PAYMENT" &&
-    invitation.status !== "PENDING_PAYMENT_APPROVAL"
+    invitation.status === "ACCEPTED" ||
+    invitation.status === "REJECTED"
   ) {
-    throw new Error(
-      "Invitation already processed"
-    );
+    throw new Error("Invitation already processed");
   }
 
   // UPDATE STATUS
@@ -296,10 +291,8 @@ const payAndAcceptInvitation = async (
   }
 
   // PREVENT DOUBLE ACTION
-  if (invitation.status !== "PENDING") {
-    throw new Error(
-      "Invitation already processed"
-    );
+  if (invitation.status !== "PENDING_PAYMENT") {
+    throw new Error("Invitation already processed");
   }
 
   // MUST BE PAID EVENT
@@ -333,7 +326,7 @@ const payAndAcceptInvitation = async (
     data: {
       userId,
       eventId: invitation.eventId,
-      status: "APPROVED",
+      status: "PENDING",
     },
   });
 
@@ -342,7 +335,7 @@ const payAndAcceptInvitation = async (
     where: { id: invitationId },
 
     data: {
-      status: "ACCEPTED",
+      status: "PENDING_PAYMENT_APPROVAL",
     },
   });
 };
