@@ -211,7 +211,23 @@ const getEventRegistrations = async (
       ...(status && { status }),
     },
     include: {
-      user: { select: { id: true, name: true, email: true } },
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+
+      payment: {
+        select: {
+          id: true,
+          amount: true,
+          status: true,
+          transactionId: true,
+          createdAt: true,
+        },
+      },
     },
   });
 };
