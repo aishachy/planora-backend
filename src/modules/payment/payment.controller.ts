@@ -7,6 +7,7 @@ import { catchAsync } from "../../app/shared/catchAsync.js";
 import { sendResponse } from "../../app/shared/sendResponse.js";
 import { stripe } from "../../app/config/stripe.config.js";
 import { v4 as uuidv4 } from "uuid";
+import { prisma } from "../../lib/prisma.js";
 
 // Create Stripe checkout session
 const createCheckoutSession = catchAsync(async (req: Request, res: Response) => {
@@ -14,7 +15,21 @@ const createCheckoutSession = catchAsync(async (req: Request, res: Response) => 
 
   if (!registrationId || !amount)
     return res.status(400).json({ success: false, message: "Missing registrationId or amount" });
+  const existingPayment =
+    await prisma.payment.findFirst({
+      where: {
+        registrationId,
+        status: "PENDING",
+      },
+    });
 
+  if (existingPayment) {
+    return res.status(400).json({
+      success: false,
+      message:
+        "A pending payment already exists",
+    });
+  }
   const payment = await PaymentService.createPaymentRecord({
     registrationId,
     amount,

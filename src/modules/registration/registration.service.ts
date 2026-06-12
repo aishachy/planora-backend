@@ -183,6 +183,16 @@ const getMyRegistrations = async (userId: string) =>
           fee: true,
         },
       },
+
+      payment: {
+        select: {
+          id: true,
+          amount: true,
+          status: true,
+          transactionId: true,
+          invoiceUrl: true,
+        },
+      },
     },
   });
 
@@ -197,9 +207,20 @@ const getEventRegistrations = async (
 ) => {
   const event = await prisma.event.findUnique({
     where: { id: eventId },
+    include: {
+      organizer: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
   });
 
-  if (!event) throw new Error("Event not found");
+  if (!event) {
+    throw new Error("Event not found");
+  }
 
   if (event.organizerId !== ownerId) {
     throw new Error("Not authorized");
@@ -235,24 +256,51 @@ const getEventRegistrations = async (
 /* =====================================================
    APPROVE REGISTRATION (OWNER)
 ===================================================== */
-const approveRegistration = async (id: string, ownerId: string) => {
-  const registration = await prisma.registration.findUnique({
-    where: { id },
-    include: { event: true },
-  });
+const approveRegistration = async (
+  id: string,
+  ownerId: string
+) => {
+  const registration =
+    await prisma.registration.findUnique({
+      where: { id },
+      include: {
+        event: true,
+        payment: true,
+      },
+    });
 
-  if (!registration) throw new Error("Registration not found");
+  if (!registration) {
+    throw new Error("Registration not found");
+  }
 
-  if (registration.event.organizerId !== ownerId) {
+  if (
+    registration.event.organizerId !== ownerId
+  ) {
     throw new Error("Not authorized");
   }
 
-  const updated = await prisma.registration.update({
-    where: { id },
-    data: {
-      status: RegistrationStatus.APPROVED,
-    },
-  });
+  // For paid events, verify payment first
+  if (registration.event.isPaid) {
+    const hasCompletedPayment =
+      registration.payment.some(
+        (p) => p.status === "COMPLETED"
+      );
+
+    if (!hasCompletedPayment) {
+      throw new Error(
+        "Payment not completed"
+      );
+    }
+  }
+
+  const updated =
+    await prisma.registration.update({
+      where: { id },
+      data: {
+        status:
+          RegistrationStatus.APPROVED,
+      },
+    });
 
   await prisma.invitation.updateMany({
     where: {
