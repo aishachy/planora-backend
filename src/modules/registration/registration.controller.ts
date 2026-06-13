@@ -113,6 +113,8 @@ export const getRegistrationById = async (req: Request, res: Response) => {
       ? req.params.eventId[0]
       : req.params.eventId;
     const userId = req.user?.id;
+    console.log("USER ID:", req.user?.id);
+    console.log("EVENT ID:", req.params.eventId);
 
     if (!userId) {
       return res.status(401).json({

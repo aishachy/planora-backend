@@ -28,7 +28,7 @@ router.post("/", auth("USER"), registerToEvent);
 router.get("/me", auth("USER", "ADMIN"), getMyRegistrations);
 
 // Event registrations
-router.get("/event/:eventId", auth("USER"), getEventRegistrations);
+router.get("/event/:eventId/all", auth("USER", "ADMIN"), getEventRegistrations);
 
 // Ban / Unban
 router.post("/ban", auth("USER"), banParticipant);
@@ -39,7 +39,7 @@ router.post("/unban", auth("USER"), unbanParticipant);
 router.get("/", auth("USER", "ADMIN"), getAllRegistrations);
 
 // Get by ID (MUST be after /me, /event etc.)
-router.get("/:eventId", auth("USER", "ADMIN"), getRegistrationById);
+router.get("/event/:eventId", auth("USER", "ADMIN"), getRegistrationById);
 
 // Update actions
 router.patch("/approve/:id", auth("USER"), approveRegistration);
