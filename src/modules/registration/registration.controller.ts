@@ -109,31 +109,39 @@ export const getEventRegistrations = async (req: Request, res: Response) => {
 
 export const getRegistrationById = async (req: Request, res: Response) => {
   try {
-    const id = Array.isArray(req.params.id)
-      ? req.params.id[0]
-      : req.params.id;
+    const eventId = Array.isArray(req.params.eventId)
+      ? req.params.eventId[0]
+      : req.params.eventId;
+    const userId = req.user?.id;
 
-    if (!id) {
-      return res.status(400).json({
+    if (!userId) {
+      return res.status(401).json({
         success: false,
-        message: "Missing registration id",
+        message: "Unauthorized",
       });
     }
 
-    const registration = await registrationService.getRegistrationById(id);
+    if (!eventId) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing event id",
+      });
+    }
 
-    res.status(200).json({
+    const registration =
+      await registrationService.getRegistrationById(userId, eventId);
+
+    return res.status(200).json({
       success: true,
       data: registration,
     });
   } catch (error: any) {
-    res.status(400).json({
+    return res.status(404).json({
       success: false,
       message: error.message,
     });
   }
 };
-
 /* =====================================================
    APPROVE
 ===================================================== */

@@ -248,9 +248,15 @@ const getEventRegistrations = async (
     },
   });
 };
-const getRegistrationById = async (id: string) => {
-  const registration = await prisma.registration.findUnique({
-    where: { id },
+export const getRegistrationById = async (
+  userId: string,
+  eventId: string
+) => {
+  const registration = await prisma.registration.findFirst({
+    where: {
+      userId,
+      eventId,
+    },
     include: {
       user: {
         select: {
@@ -271,7 +277,7 @@ const getRegistrationById = async (id: string) => {
           isPublic: true,
         },
       },
-      payment: true, // IMPORTANT for Stripe status
+      payment: true,
     },
   });
 
@@ -281,7 +287,6 @@ const getRegistrationById = async (id: string) => {
 
   return registration;
 };
-
 
 /* =====================================================
    APPROVE REGISTRATION (OWNER)
