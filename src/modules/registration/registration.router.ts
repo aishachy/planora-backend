@@ -39,7 +39,7 @@ router.post("/unban", auth("USER"), unbanParticipant);
 router.get("/", auth("USER", "ADMIN"), getAllRegistrations);
 
 // Get by ID (MUST be after /me, /event etc.)
-router.get("/:id", auth("USER", "ADMIN"), getRegistrationById);
+router.get("/:eventId", auth("USER", "ADMIN"), getRegistrationById);
 
 // Update actions
 router.patch("/approve/:id", auth("USER"), approveRegistration);
