@@ -9,32 +9,43 @@ import {
   banParticipant,
   getEventRegistrations,
   unbanParticipant,
+  getRegistrationById,
 } from "./registration.controller.js";
 import auth from "../../middleware/auth.js";
 
 const router = Router();
 
-// Register for an event
+/* =========================
+   CREATE
+========================= */
 router.post("/", auth("USER"), registerToEvent);
 
-// Get all registrations (optional admin)
-router.get("/", auth("USER"), getAllRegistrations);
+/* =========================
+   SPECIAL ROUTES (MUST COME FIRST)
+========================= */
 
-// Get my registrations
-router.get("/me", auth("USER"), getMyRegistrations);
+// My registrations
+router.get("/me", auth("USER", "ADMIN"), getMyRegistrations);
 
-// Get event registrations (OWNER ONLY)
+// Event registrations
 router.get("/event/:eventId", auth("USER"), getEventRegistrations);
-
-// Approve / Reject (OWNER ONLY)
-router.patch("/approve/:id", auth("USER"), approveRegistration);
-router.patch("/reject/:id", auth("USER"), rejectRegistration);
 
 // Ban / Unban
 router.post("/ban", auth("USER"), banParticipant);
 router.post("/unban", auth("USER"), unbanParticipant);
 
-// Delete registration
+
+// Get all
+router.get("/", auth("USER", "ADMIN"), getAllRegistrations);
+
+// Get by ID (MUST be after /me, /event etc.)
+router.get("/:id", auth("USER", "ADMIN"), getRegistrationById);
+
+// Update actions
+router.patch("/approve/:id", auth("USER"), approveRegistration);
+router.patch("/reject/:id", auth("USER"), rejectRegistration);
+
+// Delete
 router.delete("/:id", auth("USER"), deleteRegistration);
 
 export const registrationRouter = router;

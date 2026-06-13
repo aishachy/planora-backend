@@ -107,6 +107,33 @@ export const getEventRegistrations = async (req: Request, res: Response) => {
   }
 };
 
+export const getRegistrationById = async (req: Request, res: Response) => {
+  try {
+    const id = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing registration id",
+      });
+    }
+
+    const registration = await registrationService.getRegistrationById(id);
+
+    res.status(200).json({
+      success: true,
+      data: registration,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 /* =====================================================
    APPROVE
 ===================================================== */
@@ -140,8 +167,8 @@ export const approveRegistration = async (req: Request, res: Response) => {
 export const rejectRegistration = async (req: Request, res: Response) => {
   try {
     const id = Array.isArray(req.params.id)
-  ? req.params.id[0]
-  : req.params.id;
+      ? req.params.id[0]
+      : req.params.id;
     const ownerId = (req as any).user?.id;
 
     const updated = await registrationService.rejectRegistration(

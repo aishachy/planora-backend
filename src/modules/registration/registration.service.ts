@@ -35,7 +35,7 @@ const registerToEvent = async (
     throw new Error("You cannot register for your own event");
   }
 
-  // 3. CHECK BLOCK FIRST
+  // 3. CHECK BLOCKED USERS
   const blocked = await prisma.registration.findFirst({
     where: {
       userId,
@@ -55,38 +55,30 @@ const registerToEvent = async (
     },
   });
 
-  // 5. DETERMINE STATUS
+  // 5. DETERMINE INITIAL REGISTRATION STATUS
+  // IMPORTANT: This is ONLY initial state before payment/approval
   let registrationStatus: RegistrationStatus;
 
   if (status) {
     registrationStatus = status;
-  } else if (event.isPublic && !event.isPaid) {
-    registrationStatus = RegistrationStatus.APPROVED;
+  } else {
+    // Free public events → auto approved
+    if (event.isPublic && !event.isPaid) {
+      registrationStatus = RegistrationStatus.APPROVED;
+    }
+    // ALL paid events → always pending (waiting for payment)
+    else {
+      registrationStatus = RegistrationStatus.PENDING;
+    }
   }
 
-  // Public Paid
-  else if (event.isPublic && event.isPaid) {
-    registrationStatus = RegistrationStatus.PENDING;
-  }
-
-  // Private Free
-  else if (!event.isPublic && !event.isPaid) {
-    registrationStatus = RegistrationStatus.PENDING;
-  }
-
-  // Private Paid
-  else {
-    registrationStatus = RegistrationStatus.PENDING;
-  }
-
-  // 6. HANDLE EXISTING
+  // 6. HANDLE EXISTING REGISTRATION
   if (existing) {
-    //  Blocked users can NEVER reapply
     if (existing.status === RegistrationStatus.BLOCKED) {
       throw new Error("You are blocked from this event");
     }
 
-    //  Allow reapply if rejected
+    // allow reapply if rejected
     if (existing.status === RegistrationStatus.REJECTED) {
       return prisma.registration.update({
         where: {
@@ -111,6 +103,8 @@ const registerToEvent = async (
               date: true,
               venue: true,
               fee: true,
+              isPaid: true,
+              isPublic: true,
             },
           },
         },
@@ -120,7 +114,7 @@ const registerToEvent = async (
     throw new Error("Already registered for this event");
   }
 
-  // 7. CREATE NEW
+  // 7. CREATE NEW REGISTRATION
   return prisma.registration.create({
     data: {
       userId,
@@ -143,6 +137,8 @@ const registerToEvent = async (
           date: true,
           venue: true,
           fee: true,
+          isPaid: true,
+          isPublic: true,
         },
       },
     },
@@ -252,6 +248,40 @@ const getEventRegistrations = async (
     },
   });
 };
+const getRegistrationById = async (id: string) => {
+  const registration = await prisma.registration.findUnique({
+    where: { id },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+        },
+      },
+      event: {
+        select: {
+          id: true,
+          title: true,
+          date: true,
+          venue: true,
+          fee: true,
+          isPaid: true,
+          isPublic: true,
+        },
+      },
+      payment: true, // IMPORTANT for Stripe status
+    },
+  });
+
+  if (!registration) {
+    throw new Error("Registration not found");
+  }
+
+  return registration;
+};
+
 
 /* =====================================================
    APPROVE REGISTRATION (OWNER)
@@ -437,4 +467,5 @@ export const registrationService = {
   banParticipant,
   unbanParticipant,
   deleteRegistration,
+  getRegistrationById,
 };

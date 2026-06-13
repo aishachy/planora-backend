@@ -1,10 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Stripe from "stripe";
 import { prisma } from "../../lib/prisma.js";
-import {
-  PaymentStatus,
-  RegistrationStatus,
-} from "../../generated/prisma/enums.js";
+import { PaymentStatus, RegistrationStatus } from "../../generated/prisma/enums.js";
 import { uploadFileToCloudinary } from "../../app/config/cloudinary.config.js";
 import { sendEmail } from "../../utils/email.js";
 import { generateInvoicePdf } from "../../utils/payment.js";
@@ -14,8 +11,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export const PaymentService = {
-  // 1️⃣ Create payment record in DB
-  createPaymentRecord: (data: { registrationId: string; amount: number; transactionId: string }) => {
+  // CREATE PAYMENT RECORD
+  createPaymentRecord: (data: {
+    registrationId: string;
+    amount: number;
+    transactionId: string;
+  }) => {
     return prisma.payment.create({
       data: {
         registrationId: data.registrationId,
@@ -26,61 +27,70 @@ export const PaymentService = {
     });
   },
 
-  // 2️⃣ Create Stripe Checkout session
+  // CREATE STRIPE SESSION
   createStripeCheckoutSession: (payment: any, registrationId: string, amount: number) => {
     return stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
+
       line_items: [
         {
           price_data: {
             currency: "usd",
-            product_data: { name: "Event Ticket" },
+            product_data: {
+              name: "Event Ticket",
+            },
             unit_amount: amount * 100,
           },
           quantity: 1,
         },
       ],
-      metadata: { registrationId, paymentId: payment.id },
-      success_url: "http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}", // ✅ full URL
-      cancel_url: "http://localhost:3000/cancel",
-      // success_url: `${process.env.FRONTEND_URL}/payment-success`,
-      // cancel_url: `${process.env.FRONTEND_URL}/payment-cancel`,
+
+      metadata: {
+        registrationId,
+        paymentId: payment.id,
+      },
+
+      success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL}/cancel`,
     });
   },
 
-  // 3️⃣ Handle Stripe webhook events
+  // STRIPE WEBHOOK HANDLER
   handlerStripeWebhookEvent: async (event: Stripe.Event) => {
-    const existingPayment = await prisma.payment.findFirst({
-      where: { stripeEventId: event.id },
+    const existingEvent = await prisma.payment.findFirst({
+      where: {
+        stripeEventId: event.id,
+      },
     });
 
-    if (existingPayment) {
-      console.log(`Event ${event.id} already processed.`);
-      return { message: `Event ${event.id} already processed.` };
+    if (existingEvent) {
+      return { message: "Event already processed" };
     }
 
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as any;
+
         const registrationId = session.metadata?.registrationId;
         const paymentId = session.metadata?.paymentId;
 
-        if (!registrationId || !paymentId) return { message: "Missing metadata" };
+        if (!registrationId || !paymentId) {
+          return { message: "Missing metadata" };
+        }
 
         const registration = await prisma.registration.findUnique({
           where: { id: registrationId },
-          include: { user: true, event: true, payment: true },
+          include: { user: true, event: true },
         });
 
-        if (!registration) return { message: "Registration not found" };
+        if (!registration) {
+          return { message: "Registration not found" };
+        }
 
         let pdfBuffer: Buffer | null = null;
 
-        const result = await prisma.$transaction(async (tx: {
-          [x: string]: any;
-          registration: any; payment: { update: (arg0: { where: { id: any; } | { id: any; }; data: { status: "COMPLETED" | "FAILED"; stripeEventId: string; paymentGatewayData: any; } | { invoiceUrl: string; }; }) => any; };
-        }) => {
+        const result = await prisma.$transaction(async (tx) => {
           const updatedPayment = await tx.payment.update({
             where: { id: paymentId },
             data: {
@@ -92,15 +102,14 @@ export const PaymentService = {
               paymentGatewayData: session,
             },
           });
+
           if (session.payment_status === "paid") {
-            await tx.registration.update({
-              where: {
-                id: registrationId,
-              },
-              data: {
-                status: RegistrationStatus.PENDING,
-              },
-            });
+          await tx.registration.update({
+            where: { id: registrationId },
+            data: {
+              status: RegistrationStatus.APPROVED,
+            },
+          });
 
             await tx.invitation.updateMany({
               where: {
@@ -111,11 +120,7 @@ export const PaymentService = {
                 status: "PENDING_PAYMENT_APPROVAL",
               },
             });
-          }
 
-          let invoiceUrl: string | null = null;
-
-          if (session.payment_status === "paid") {
             try {
               pdfBuffer = await generateInvoicePdf({
                 invoiceId: updatedPayment.id,
@@ -129,59 +134,58 @@ export const PaymentService = {
 
               const cloudinaryResponse = await uploadFileToCloudinary(
                 pdfBuffer,
-                `registrations/invoices/invoice-${paymentId}-${Date.now()}.pdf`
+                `invoices/invoice-${paymentId}-${Date.now()}.pdf`
               );
-
-              invoiceUrl = cloudinaryResponse?.secure_url;
 
               await tx.payment.update({
                 where: { id: paymentId },
-                data: { invoiceUrl },
+                data: {
+                  invoiceUrl: cloudinaryResponse?.secure_url,
+                },
               });
             } catch (err) {
-              console.error("Error generating/uploading invoice PDF:", err);
+              console.error("Invoice error:", err);
             }
-          }
 
-          if (session.payment_status === "paid" && invoiceUrl) {
             try {
               await sendEmail({
                 to: registration.user.email,
-                subject: `Payment Confirmation & Invoice for ${registration.event.title}`,
+                subject: `Payment Confirmation - ${registration.event.title}`,
                 templateName: "invoice",
                 templateData: {
                   registrationName: registration.user.name,
-                  invoiceId: result?.updatedPayment.id,
+                  invoiceId: updatedPayment.id,
                   transactionId: updatedPayment.transactionId,
                   paymentDate: new Date().toLocaleDateString(),
                   eventName: registration.event.title,
                   amount: updatedPayment.amount,
-                  invoiceUrl,
                 },
-                attachments: [
-                  {
-                    filename: `Invoice-${paymentId}.pdf`,
-                    content: pdfBuffer || Buffer.from(""),
-                    contentType: "application/pdf",
-                  },
-                ],
+                attachments: pdfBuffer
+                  ? [
+                      {
+                        filename: `Invoice-${paymentId}.pdf`,
+                        content: pdfBuffer,
+                        contentType: "application/pdf",
+                      },
+                    ]
+                  : [],
               });
             } catch (emailErr) {
-              console.error("Error sending invoice email:", emailErr);
+              console.error("Email error:", emailErr);
             }
           }
 
-          return { updatedPayment, invoiceUrl };
+          return { updatedPayment };
         });
 
-        console.log(`Payment processed for registration ${registrationId}`);
+        console.log("Payment completed:", result.updatedPayment.id);
         break;
       }
 
       default:
-        console.log(`Unhandled event type ${event.type}`);
+        console.log("Unhandled event:", event.type);
     }
 
-    return { message: `Webhook Event ${event.id} processed successfully` };
+    return { message: "Webhook processed" };
   },
 };
