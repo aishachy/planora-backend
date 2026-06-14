@@ -20,27 +20,32 @@ const createCheckoutSession = catchAsync(async (req: Request, res: Response) => 
     });
   }
 
-  // prevent duplicate pending payment
+  // STEP 1: Check for existing PENDING payment
   const existingPayment = await prisma.payment.findFirst({
     where: {
       registrationId,
       status: "PENDING",
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
+  let payment;
+
+  // STEP 2: If pending exists → reuse it instead of blocking
   if (existingPayment) {
-    return res.status(400).json({
-      success: false,
-      message: "A pending payment already exists",
+    payment = existingPayment;
+  } else {
+    // STEP 3: Create new payment record
+    payment = await PaymentService.createPaymentRecord({
+      registrationId,
+      amount,
+      transactionId: uuidv4(),
     });
   }
 
-  const payment = await PaymentService.createPaymentRecord({
-    registrationId,
-    amount,
-    transactionId: uuidv4(),
-  });
-
+  // STEP 4: Always create a fresh Stripe session
   const session = await PaymentService.createStripeCheckoutSession(
     payment,
     registrationId,
@@ -49,7 +54,9 @@ const createCheckoutSession = catchAsync(async (req: Request, res: Response) => 
 
   return res.status(200).json({
     success: true,
-    message: "Checkout session created",
+    message: existingPayment
+      ? "Reusing existing pending payment"
+      : "Checkout session created",
     payment,
     sessionId: session.id,
     url: session.url,
@@ -71,7 +78,11 @@ const handleStripeWebhookEvent = catchAsync(async (req: Request, res: Response) 
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(req.body, signature, webhookSecret);
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      signature,
+      webhookSecret
+    );
   } catch (error: any) {
     console.error("Webhook signature error:", error.message);
     return res.status(status.BAD_REQUEST).json({
