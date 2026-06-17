@@ -71,9 +71,10 @@ model Registration {
   eventId String
   event   Event              @relation(fields: [eventId], references: [id])
 
-  payment          Payment[] @relation(name: "PaymentsToRegistration")
-  registrationDate DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  payment          Payment[]    @relation(name: "PaymentsToRegistration")
+  registrationDate DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  invitations      Invitation[]
 
   @@unique([userId, eventId])
   @@map("registrations")
@@ -115,11 +116,12 @@ model Review {
 }
 
 model Invitation {
-  id        String           @id @default(uuid())
-  eventId   String
-  userId    String
-  inviterId String
-  status    InvitationStatus @default(PENDING)
+  id             String           @id @default(uuid())
+  eventId        String
+  userId         String
+  inviterId      String
+  registrationId String?
+  status         InvitationStatus @default(PENDING)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -127,6 +129,8 @@ model Invitation {
   event   Event @relation(fields: [eventId], references: [id])
   user    User  @relation(fields: [userId], references: [id])
   inviter User  @relation("Inviter", fields: [inviterId], references: [id])
+
+  registration Registration? @relation(fields: [registrationId], references: [id])
 
   @@unique([eventId, userId])
 }

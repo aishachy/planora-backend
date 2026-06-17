@@ -67,7 +67,7 @@ const createCheckoutSession = catchAsync(async (req: Request, res: Response) => 
 const handleStripeWebhookEvent = catchAsync(async (req: Request, res: Response) => {
   const signature = req.headers["stripe-signature"] as string;
   const webhookSecret = envVars.STRIPE.STRIPE_WEBHOOK_SECRET;
-
+  console.log("WEBHOOK HIT");
   if (!signature || !webhookSecret) {
     return res.status(status.BAD_REQUEST).json({
       success: false,

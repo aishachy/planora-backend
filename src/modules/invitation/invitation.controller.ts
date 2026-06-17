@@ -2,12 +2,15 @@
 import { Request, Response } from "express";
 import { invitationService } from "./invitation.service.js";
 
+// ========================
+// SEND INVITATION
+// ========================
 const sendInvitation = async (req: Request, res: Response) => {
   try {
     const inviterId = req.user!.id;
+    const inviterRole = req.user!.role;
     const { eventId, userId } = req.body;
 
-    const inviterRole = req.user!.role;
     const data = await invitationService.sendInvitation(
       eventId,
       userId,
@@ -15,142 +18,130 @@ const sendInvitation = async (req: Request, res: Response) => {
       inviterRole
     );
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Invitation sent",
       data,
     });
   } catch (err: any) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: err.message,
     });
   }
 };
 
-export const acceptInvitationController = async (req: Request, res: Response) => {
+// ========================
+// GET MY INVITATIONS
+// ========================
+const getMyInvitations = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const invitationId = Array.isArray(id) ? id[0] : id;
-
     const userId = req.user!.id;
 
-    const result = await invitationService.acceptInvitation(
+    const data = await invitationService.getMyInvitations(userId);
+
+    return res.json({
+      success: true,
+      data,
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+// ========================
+// ACCEPT INVITATION
+// ========================
+const acceptInvitation = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const invitationId = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
+
+    const data = await invitationService.acceptInvitation(
       invitationId,
       userId
     );
 
     return res.json({
       success: true,
-      data: result,
-    });
-  } catch (error: any) {
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-const getMyInvitations = async (req: Request, res: Response) => {
-  const userId = req.user!.id;
-
-  const data = await invitationService.getMyInvitations(userId);
-
-  res.json({
-    success: true,
-    data,
-  });
-};
-
-const getSentInvitations = async (
-  req: Request,
-  res: Response
-) => {
-  try {
-    const userId = req.user!.id; 
-    const eventId = req.query.eventId as string | undefined;
-
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-    }
-
-    const result =
-      await invitationService.getSentInvitations(userId, eventId!);
-
-    return res.status(200).json({
-      success: true,
-      data: result,
-    });
-  } catch (error: any) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-const acceptInvitation = async (req: Request, res: Response) => {
-  const userId = req.user!.id;
-
-  const invitationId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const data = await invitationService.acceptInvitation(
-    invitationId,
-    userId
-  );
-
-  res.json({
-    success: true,
-    message: "Invitation accepted",
-    data,
-  });
-};
-
-const rejectInvitation = async (req: Request, res: Response) => {
-  const userId = req.user!.id;
-  const invitationId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const data = await invitationService.rejectInvitation(
-    invitationId,
-    userId
-  );
-
-  res.json({
-    success: true,
-    message: "Invitation rejected",
-    data,
-  });
-};
-
-const payAndAccept = async (req: Request, res: Response) => {
-  try {
-    const userId = req.user!.id;
-    const invitationId = String(req.params.id);
-
-    const data = await invitationService.payAndAcceptInvitation(
-      invitationId,
-      userId
-    );
-
-    res.json({
-      success: true,
-      message: "Payment successful & invitation accepted",
+      message: "Invitation accepted",
       data,
     });
   } catch (err: any) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: err.message,
     });
   }
 };
 
+// ========================
+// REJECT INVITATION
+// ========================
+const rejectInvitation = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const invitationId = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
+
+    const data = await invitationService.rejectInvitation(
+      invitationId,
+      userId
+    );
+
+    return res.json({
+      success: true,
+      message: "Invitation rejected",
+      data,
+    });
+  } catch (err: any) {
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+// ========================
+// PAY & ACCEPT INVITATION
+// ========================
+const payAndAccept = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const invitationId = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
+
+    const data = await invitationService.payAndAcceptInvitation(
+      invitationId,
+      userId
+    );
+
+    return res.json({
+      success: true,
+      message: "Payment successful & invitation processed",
+      data,
+    });
+  } catch (err: any) {
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+// ========================
+// EXPORT
+// ========================
 export const invitationController = {
   sendInvitation,
   getMyInvitations,
-  getSentInvitations,
   acceptInvitation,
   rejectInvitation,
   payAndAccept,
