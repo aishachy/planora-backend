@@ -2,13 +2,14 @@
 import { Request, Response } from "express";
 import { invitationService } from "./invitation.service.js";
 
-// ========================
+// =========================
 // SEND INVITATION
-// ========================
+// =========================
 const sendInvitation = async (req: Request, res: Response) => {
   try {
     const inviterId = req.user!.id;
     const inviterRole = req.user!.role;
+
     const { eventId, userId } = req.body;
 
     const data = await invitationService.sendInvitation(
@@ -31,9 +32,9 @@ const sendInvitation = async (req: Request, res: Response) => {
   }
 };
 
-// ========================
+// =========================
 // GET MY INVITATIONS
-// ========================
+// =========================
 const getMyInvitations = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
@@ -52,12 +53,13 @@ const getMyInvitations = async (req: Request, res: Response) => {
   }
 };
 
-// ========================
-// ACCEPT INVITATION
-// ========================
+// =========================
+// ACCEPT INVITATION (FIXED PARAM)
+// =========================
 const acceptInvitation = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
+
     const invitationId = Array.isArray(req.params.id)
       ? req.params.id[0]
       : req.params.id;
@@ -80,12 +82,13 @@ const acceptInvitation = async (req: Request, res: Response) => {
   }
 };
 
-// ========================
-// REJECT INVITATION
-// ========================
+// =========================
+// REJECT INVITATION (FIXED PARAM)
+// =========================
 const rejectInvitation = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
+
     const invitationId = Array.isArray(req.params.id)
       ? req.params.id[0]
       : req.params.id;
@@ -108,12 +111,13 @@ const rejectInvitation = async (req: Request, res: Response) => {
   }
 };
 
-// ========================
-// PAY & ACCEPT INVITATION
-// ========================
+// =========================
+// PAY & ACCEPT
+// =========================
 const payAndAccept = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
+
     const invitationId = Array.isArray(req.params.id)
       ? req.params.id[0]
       : req.params.id;
@@ -125,7 +129,7 @@ const payAndAccept = async (req: Request, res: Response) => {
 
     return res.json({
       success: true,
-      message: "Payment successful & invitation processed",
+      message: "Payment successful & invitation updated",
       data,
     });
   } catch (err: any) {
@@ -136,9 +140,6 @@ const payAndAccept = async (req: Request, res: Response) => {
   }
 };
 
-// ========================
-// EXPORT
-// ========================
 export const invitationController = {
   sendInvitation,
   getMyInvitations,

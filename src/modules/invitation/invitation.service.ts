@@ -184,21 +184,29 @@ const payAndAcceptInvitation = async (
     throw new Error("This event is free. Use Accept instead.");
   }
 
-  const alreadyRegistered = await prisma.registration.findFirst({
-    where: {
-      id: invitation.registrationId!,
-    },
-  });
-
-  if (!alreadyRegistered) {
-    throw new Error("Registration missing");
+  if (!invitation.registrationId) {
+    throw new Error("Missing registration");
   }
 
-  // just approve registration
+  // ✅ FIX 1: check correct registration properly
+  const registration = await prisma.registration.findUnique({
+    where: { id: invitation.registrationId },
+  });
+
+  if (!registration) {
+    throw new Error("Registration not found");
+  }
+
+  // (optional safety) ensure correct user-event mapping
+  if (registration.userId !== userId) {
+    throw new Error("Invalid registration owner");
+  }
+
+  // ✅ FIX 2: keep consistent status flow
   await prisma.registration.update({
-    where: { id: invitation.registrationId! },
+    where: { id: registration.id },
     data: {
-      status: "PENDING",
+      status: "PENDING", // waiting payment approval
     },
   });
 
