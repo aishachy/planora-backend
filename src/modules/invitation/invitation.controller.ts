@@ -114,36 +114,34 @@ const rejectInvitation = async (req: Request, res: Response) => {
 // =========================
 // PAY & ACCEPT
 // =========================
-const payAndAccept = async (req: Request, res: Response) => {
+const approvePaymentInvitation = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
-
     const invitationId = Array.isArray(req.params.id)
       ? req.params.id[0]
       : req.params.id;
 
-    const data = await invitationService.payAndAcceptInvitation(
+    const data = await invitationService.approvePaymentInvitation(
       invitationId,
       userId
     );
 
-    return res.json({
+    res.json({
       success: true,
-      message: "Payment successful & invitation updated",
+      message: "Payment approved by organizer",
       data,
     });
   } catch (err: any) {
-    return res.status(400).json({
+    res.status(400).json({
       success: false,
       message: err.message,
     });
   }
 };
-
 export const invitationController = {
   sendInvitation,
   getMyInvitations,
   acceptInvitation,
   rejectInvitation,
-  payAndAccept,
+  approvePaymentInvitation,
 };

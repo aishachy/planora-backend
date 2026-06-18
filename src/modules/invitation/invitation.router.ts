@@ -12,7 +12,7 @@ router.get("/me", auth("ADMIN", "USER"), invitationController.getMyInvitations);
 
 // OPTIONAL ALIAS (FIX YOUR FRONTEND ISSUE)
 router.get(
-  "/sentInvitations",
+  "/sendInvitation",
   auth("ADMIN", "USER"),
   invitationController.getMyInvitations
 );
@@ -22,6 +22,6 @@ router.patch("/:id/accept", auth("ADMIN", "USER"), invitationController.acceptIn
 router.patch("/:id/reject", auth("ADMIN", "USER"), invitationController.rejectInvitation);
 
 // PAY
-router.post("/pay/:id", auth("ADMIN", "USER"), invitationController.payAndAccept);
+router.post("/:id/approve-payment", auth("ADMIN", "USER"), invitationController.approvePaymentInvitation);
 
 export const invitationRouter = router;

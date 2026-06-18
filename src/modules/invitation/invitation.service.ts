@@ -87,7 +87,13 @@ const getMyInvitations = async (userId: string) => {
       createdAt: true,
 
       registrationId: true, // ✔ IMPORTANT FIX
-
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
       event: {
         select: {
           id: true,
@@ -164,56 +170,41 @@ const rejectInvitation = async (invitationId: string, userId: string) => {
 // ========================
 // PAY & ACCEPT (FIXED)
 // ========================
-const payAndAcceptInvitation = async (
+const approvePaymentInvitation = async (
   invitationId: string,
   userId: string
 ) => {
   const invitation = await prisma.invitation.findUnique({
     where: { id: invitationId },
-    include: { event: true },
+    include: {
+      event: true,
+      registration: true,
+    },
   });
 
   if (!invitation) throw new Error("Invitation not found");
-  if (invitation.userId !== userId) throw new Error("Unauthorized");
 
-  if (invitation.status !== "PENDING_PAYMENT") {
-    throw new Error("Invitation already processed");
+  // only inviter/organizer can approve
+  if (invitation.inviterId !== userId) {
+    throw new Error("Only inviter can approve this payment");
   }
 
-  if (!invitation.event.isPaid) {
-    throw new Error("This event is free. Use Accept instead.");
+  if (invitation.status !== "PENDING_PAYMENT_APPROVAL") {
+    throw new Error("Invalid status for approval");
   }
 
-  if (!invitation.registrationId) {
-    throw new Error("Missing registration");
-  }
-
-  // ✅ FIX 1: check correct registration properly
-  const registration = await prisma.registration.findUnique({
-    where: { id: invitation.registrationId },
-  });
-
-  if (!registration) {
-    throw new Error("Registration not found");
-  }
-
-  // (optional safety) ensure correct user-event mapping
-  if (registration.userId !== userId) {
-    throw new Error("Invalid registration owner");
-  }
-
-  // ✅ FIX 2: keep consistent status flow
+  // final approval
   await prisma.registration.update({
-    where: { id: registration.id },
+    where: { id: invitation.registrationId! },
     data: {
-      status: "PENDING", // waiting payment approval
+      status: "APPROVED",
     },
   });
 
   return prisma.invitation.update({
     where: { id: invitationId },
     data: {
-      status: "PENDING_PAYMENT_APPROVAL",
+      status: "ACCEPTED",
     },
   });
 };
@@ -223,5 +214,5 @@ export const invitationService = {
   getMyInvitations,
   acceptInvitation,
   rejectInvitation,
-  payAndAcceptInvitation,
+  approvePaymentInvitation,
 };
