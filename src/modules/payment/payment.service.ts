@@ -14,9 +14,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export const PaymentService = {
-  // =========================
-  // CREATE PAYMENT RECORD
-  // =========================
   createPaymentRecord: async (data: {
     registrationId: string;
     amount: number;
@@ -32,9 +29,6 @@ export const PaymentService = {
     });
   },
 
-  // =========================
-  // CREATE STRIPE SESSION
-  // =========================
   createStripeCheckoutSession: async (
     payment: any,
     registrationId: string,
@@ -66,14 +60,10 @@ export const PaymentService = {
     });
   },
 
-  // =========================
-  // STRIPE WEBHOOK HANDLER (FIXED)
-  // =========================
   handlerStripeWebhookEvent: async (event: Stripe.Event) => {
     console.log("🔥 WEBHOOK RECEIVED:", event.type);
 
     try {
-      // Ignore duplicates
       const existing = await prisma.payment.findFirst({
         where: { stripeEventId: event.id },
       });
@@ -83,7 +73,6 @@ export const PaymentService = {
         return;
       }
 
-      // Only handle successful checkout
       if (event.type !== "checkout.session.completed") {
         return;
       }
@@ -116,7 +105,7 @@ export const PaymentService = {
         session.status === "complete";
 
       // =========================
-      // STEP 1: DB UPDATE (FAST ONLY)
+      // STEP 1: UPDATE PAYMENT
       // =========================
       const updatedPayment = await prisma.payment.update({
         where: { id: paymentId },
@@ -131,6 +120,9 @@ export const PaymentService = {
 
       if (!isPaid) return;
 
+      // =========================
+      // STEP 2: UPDATE REGISTRATION
+      // =========================
       await prisma.registration.update({
         where: { id: registrationId },
         data: {
@@ -138,18 +130,21 @@ export const PaymentService = {
         },
       });
 
+      // =========================
+      // STEP 3: KEEP INVITATION CLEAN (NO PAYMENT STATUS HERE)
+      // =========================
       await prisma.invitation.updateMany({
         where: {
           eventId: registration.eventId,
           userId: registration.userId,
         },
         data: {
-          status: "PENDING_PAYMENT_APPROVAL",
+          status: "ACCEPTED",
         },
       });
 
       // =========================
-      // STEP 2: HEAVY TASKS OUTSIDE TRANSACTION
+      // STEP 4: HEAVY TASKS
       // =========================
       try {
         const pdfBuffer = await generateInvoicePdf({

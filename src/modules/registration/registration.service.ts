@@ -308,13 +308,11 @@ const approveRegistration = async (
     throw new Error("Registration not found");
   }
 
-  if (
-    registration.event.organizerId !== ownerId
-  ) {
+  if (registration.event.organizerId !== ownerId) {
     throw new Error("Not authorized");
   }
 
-  // For paid events, verify payment first
+  // Paid event must have successful payment
   if (registration.event.isPaid) {
     const hasCompletedPayment =
       registration.payment.some(
@@ -323,7 +321,7 @@ const approveRegistration = async (
 
     if (!hasCompletedPayment) {
       throw new Error(
-        "Payment not completed"
+        "Payment not completed yet"
       );
     }
   }
@@ -332,8 +330,7 @@ const approveRegistration = async (
     await prisma.registration.update({
       where: { id },
       data: {
-        status:
-          RegistrationStatus.APPROVED,
+        status: RegistrationStatus.APPROVED,
       },
     });
 

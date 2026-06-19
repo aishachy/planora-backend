@@ -142,7 +142,9 @@ enum Role {
 
 enum RegistrationStatus {
   PENDING
-  APPROVED
+  PAID
+  APPROVAL
+  ACCEPTED
   REJECTED
   BLOCKED
 }
@@ -157,6 +159,4 @@ enum InvitationStatus {
   PENDING
   ACCEPTED
   REJECTED
-  PENDING_PAYMENT
-  PENDING_PAYMENT_APPROVAL
 }

@@ -94,6 +94,13 @@ const getMyInvitations = async (userId: string) => {
           email: true,
         },
       },
+      inviter: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
       event: {
         select: {
           id: true,
