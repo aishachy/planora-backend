@@ -43,7 +43,7 @@ const sendInvitation = async (
     },
   });
 
-  return prisma.invitation.create({
+  const invitation = await prisma.invitation.create({
     data: {
       eventId,
       userId,
@@ -52,50 +52,25 @@ const sendInvitation = async (
       registrationId: registration.id,
     },
   });
+
+  return invitation;
 };
 
 // ========================
-// GET MY INVITATIONS
+// GET MY INVITATIONS (SAFE)
 // ========================
 const getMyInvitations = async (userId: string) => {
-  return prisma.invitation.findMany({
+  const data = await prisma.invitation.findMany({
     where: { userId },
 
-    include: {
-      event: {
-        select: {
-          id: true,
-          title: true,
-          date: true,
-          venue: true,
-          isPaid: true,
-          fee: true,
-        },
-      },
+    select: {
+      id: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
 
-      inviter: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-    },
+      registrationId: true,
 
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-};
-
-// ========================
-// GET SENT INVITATIONS
-// ========================
-const getSentInvitations = async (inviterId: string) => {
-  return prisma.invitation.findMany({
-    where: { inviterId },
-
-    include: {
       user: {
         select: {
           id: true,
@@ -128,16 +103,78 @@ const getSentInvitations = async (inviterId: string) => {
       createdAt: "desc",
     },
   });
+
+  return data;
 };
 
 // ========================
-// ACCEPT FREE EVENT
+// GET SENT INVITATIONS (SAFE)
+// ========================
+const getSentInvitations = async (inviterId: string) => {
+  const data = await prisma.invitation.findMany({
+    where: { inviterId },
+
+    select: {
+      id: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+
+      registrationId: true,
+
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+
+      inviter: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+
+      event: {
+        select: {
+          id: true,
+          title: true,
+          date: true,
+          venue: true,
+          isPaid: true,
+          fee: true,
+        },
+      },
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return data;
+};
+
+// ========================
+// ACCEPT INVITATION
 // ========================
 const acceptInvitation = async (invitationId: string, userId: string) => {
   const invitation = await prisma.invitation.findUnique({
     where: { id: invitationId },
-    include: {
-      event: true,
+    select: {
+      id: true,
+      userId: true,
+      inviterId: true,
+      status: true,
+      registrationId: true,
+      event: {
+        select: {
+          isPaid: true,
+        },
+      },
     },
   });
 
@@ -152,9 +189,21 @@ const acceptInvitation = async (invitationId: string, userId: string) => {
   if (invitation.event.isPaid) {
     throw new Error("This is a paid event. Payment required.");
   }
+  if (!invitation.registrationId) {
+  throw new Error("Registration ID missing");
+}
+
+await prisma.registration.update({
+  where: {
+    id: invitation.registrationId, // now guaranteed string
+  },
+  data: {
+    status: "ACCEPTED",
+  },
+});
 
   await prisma.registration.update({
-    where: { id: invitation.registrationId! },
+    where: { id: invitation.registrationId },
     data: { status: "ACCEPTED" },
   });
 
@@ -170,21 +219,36 @@ const acceptInvitation = async (invitationId: string, userId: string) => {
 const rejectInvitation = async (invitationId: string, userId: string) => {
   const invitation = await prisma.invitation.findUnique({
     where: { id: invitationId },
+    select: {
+      id: true,
+      userId: true,
+      status: true,
+      registrationId: true,
+    },
   });
 
   if (!invitation) throw new Error("Invitation not found");
 
   if (invitation.userId !== userId) throw new Error("Unauthorized");
 
-  if (
-    invitation.status === "ACCEPTED" ||
-    invitation.status === "REJECTED"
-  ) {
+  if (invitation.status !== "PENDING") {
     throw new Error("Invitation already processed");
+  }
+  if (!invitation.registrationId) {
+    throw new Error("Registration ID missing");
   }
 
   await prisma.registration.update({
-    where: { id: invitation.registrationId! },
+    where: {
+      id: invitation.registrationId, // now guaranteed string
+    },
+    data: {
+      status: "ACCEPTED",
+    },
+  });
+
+  await prisma.registration.update({
+    where: { id: invitation.registrationId },
     data: { status: "REJECTED" },
   });
 
@@ -195,7 +259,7 @@ const rejectInvitation = async (invitationId: string, userId: string) => {
 };
 
 // ========================
-// ORGANIZER APPROVES PAYMENT
+// APPROVE PAYMENT INVITATION
 // ========================
 const approvePaymentInvitation = async (
   invitationId: string,
@@ -203,9 +267,6 @@ const approvePaymentInvitation = async (
 ) => {
   const invitation = await prisma.invitation.findUnique({
     where: { id: invitationId },
-    include: {
-      event: true,
-    },
   });
 
   if (!invitation) {
@@ -216,16 +277,23 @@ const approvePaymentInvitation = async (
     throw new Error("Only organizer can approve");
   }
 
-
+  // since you are NOT using registration relation anymore
+  if (!invitation.registrationId) {
+    throw new Error("Registration not linked to invitation");
+  }
 
   await prisma.registration.update({
-    where: { id: invitation.registrationId! },
-    data: { status: "ACCEPTED" },
+    where: { id: invitation.registrationId },
+    data: {
+      status: "ACCEPTED",
+    },
   });
 
   return prisma.invitation.update({
     where: { id: invitationId },
-    data: { status: "ACCEPTED" },
+    data: {
+      status: "ACCEPTED",
+    },
   });
 };
 
