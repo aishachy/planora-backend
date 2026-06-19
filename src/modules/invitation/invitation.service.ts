@@ -62,10 +62,39 @@ const getMyInvitations = async (userId: string) => {
     where: { userId },
 
     include: {
-      user: true,
-      inviter: true,
-      event: true,
-      registration: true,
+      registration: {
+        select: {
+          id: true,
+          status: true,
+        },
+      },
+
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+
+      inviter: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+
+      event: {
+        select: {
+          id: true,
+          title: true,
+          date: true,
+          venue: true,
+          isPaid: true,
+          fee: true,
+        },
+      },
     },
 
     orderBy: {
@@ -84,10 +113,39 @@ const getSentInvitations = async (inviterId: string) => {
     },
 
     include: {
-      user: true,
-      inviter: true,
-      event: true,
-      registration: true,
+      registration: {
+        select: {
+          id: true,
+          status: true,
+        },
+      },
+
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+
+      inviter: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+
+      event: {
+        select: {
+          id: true,
+          title: true,
+          date: true,
+          venue: true,
+          isPaid: true,
+          fee: true,
+        },
+      },
     },
 
     orderBy: {
