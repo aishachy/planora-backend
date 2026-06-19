@@ -14,7 +14,7 @@ router.get("/me", auth("ADMIN", "USER"), invitationController.getMyInvitations);
 router.get(
   "/sendInvitation",
   auth("ADMIN", "USER"),
-  invitationController.getMyInvitations
+  invitationController.getSentInvitations
 );
 
 // ACCEPT / REJECT

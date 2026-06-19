@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
 import { invitationService } from "./invitation.service.js";
+import { prisma } from "../../lib/prisma.js";
 
 // =========================
 // SEND INVITATION
@@ -35,22 +36,21 @@ const sendInvitation = async (req: Request, res: Response) => {
 // =========================
 // GET MY INVITATIONS
 // =========================
-const getMyInvitations = async (req: Request, res: Response) => {
-  try {
-    const userId = req.user!.id;
+const getMyInvitations = async (userId: string) => {
+  return prisma.invitation.findMany({
+    where: { userId },
 
-    const data = await invitationService.getMyInvitations(userId);
+    include: {
+      registration: true,
+      user: true,
+      inviter: true,
+      event: true,
+    },
 
-    return res.json({
-      success: true,
-      data,
-    });
-  } catch (err: any) {
-    return res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 };
 
 // =========================
@@ -138,10 +138,36 @@ const approvePaymentInvitation = async (req: Request, res: Response) => {
     });
   }
 };
+
+const getSentInvitations = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const inviterId = req.user!.id;
+
+    const data =
+      await invitationService.getSentInvitations(
+        inviterId
+      );
+
+    return res.json({
+      success: true,
+      data,
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
 export const invitationController = {
   sendInvitation,
   getMyInvitations,
   acceptInvitation,
   rejectInvitation,
   approvePaymentInvitation,
+  getSentInvitations,
 };

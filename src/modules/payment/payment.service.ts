@@ -126,20 +126,7 @@ export const PaymentService = {
       await prisma.registration.update({
         where: { id: registrationId },
         data: {
-          status: RegistrationStatus.APPROVED,
-        },
-      });
-
-      // =========================
-      // STEP 3: KEEP INVITATION CLEAN (NO PAYMENT STATUS HERE)
-      // =========================
-      await prisma.invitation.updateMany({
-        where: {
-          eventId: registration.eventId,
-          userId: registration.userId,
-        },
-        data: {
-          status: "ACCEPTED",
+          status: RegistrationStatus.ACCEPTED,
         },
       });
 
