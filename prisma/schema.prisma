@@ -74,7 +74,7 @@ model Registration {
   payment          Payment[]    @relation(name: "PaymentsToRegistration")
   registrationDate DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
-  invitations      Invitation[]
+  
 
   @@unique([userId, eventId])
   @@map("registrations")
@@ -129,8 +129,6 @@ model Invitation {
   event   Event @relation(fields: [eventId], references: [id])
   user    User  @relation(fields: [userId], references: [id])
   inviter User  @relation("Inviter", fields: [inviterId], references: [id])
-
-  registration Registration? @relation(fields: [registrationId], references: [id])
 
   @@unique([eventId, userId])
 }
