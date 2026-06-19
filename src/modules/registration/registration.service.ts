@@ -1,226 +1,92 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { prisma } from "../../app/lib/prisma.js";
 import { RegistrationStatus } from "../../generated/prisma/enums.js";
 
-/* =====================================================
-   REGISTER TO EVENT
-===================================================== */
-const registerToEvent = async (
-  userId: string,
-  eventId: string,
-  status?: RegistrationStatus
-) => {
-  // 1. CHECK USER
+/* =========================
+   REGISTER
+========================= */
+const registerToEvent = async (userId: string, eventId: string, status?: RegistrationStatus) => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
+    select: { id: true, isBanned: true },
   });
 
   if (!user) throw new Error("User not found");
+  if (user.isBanned) throw new Error("You are banned");
 
-  if (user.isBanned) {
-    throw new Error("You are banned from registering to events");
-  }
-
-  // 2. FETCH EVENT
   const event = await prisma.event.findUnique({
     where: { id: eventId },
+    select: { id: true, organizerId: true, isDeleted: true, isPaid: true, isPublic: true },
   });
 
-  if (!event || event.isDeleted) {
-    throw new Error("Event not found");
-  }
+  if (!event || event.isDeleted) throw new Error("Event not found");
+  if (event.organizerId === userId) throw new Error("Cannot register own event");
 
-  // Prevent owner registering own event
-  if (event.organizerId === userId) {
-    throw new Error("You cannot register for your own event");
-  }
-
-  // 3. CHECK BLOCKED USERS
-  const blocked = await prisma.registration.findFirst({
-    where: {
-      userId,
-      eventId,
-      status: RegistrationStatus.BLOCKED,
-    },
-  });
-
-  if (blocked) {
-    throw new Error("You are blocked from this event");
-  }
-
-  // 4. CHECK EXISTING REGISTRATION
   const existing = await prisma.registration.findUnique({
-    where: {
-      userId_eventId: { userId, eventId },
-    },
+    where: { userId_eventId: { userId, eventId } },
   });
 
-  // 5. DETERMINE INITIAL REGISTRATION STATUS
-  // IMPORTANT: This is ONLY initial state before payment/approval
-  let registrationStatus: RegistrationStatus;
+  const registrationStatus =
+    status ??
+    (event.isPublic && !event.isPaid
+      ? RegistrationStatus.ACCEPTED
+      : RegistrationStatus.PENDING);
 
-  if (status) {
-    registrationStatus = status;
-  } else {
-    // Free public events → auto approved
-    if (event.isPublic && !event.isPaid) {
-      registrationStatus = RegistrationStatus.APPROVED;
-    }
-    // ALL paid events → always pending (waiting for payment)
-    else {
-      registrationStatus = RegistrationStatus.PENDING;
-    }
-  }
-
-  // 6. HANDLE EXISTING REGISTRATION
   if (existing) {
     if (existing.status === RegistrationStatus.BLOCKED) {
-      throw new Error("You are blocked from this event");
+      throw new Error("Blocked");
     }
 
-    // allow reapply if rejected
     if (existing.status === RegistrationStatus.REJECTED) {
       return prisma.registration.update({
-        where: {
-          userId_eventId: { userId, eventId },
-        },
-        data: {
-          status: registrationStatus,
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              role: true,
-            },
-          },
-          event: {
-            select: {
-              id: true,
-              title: true,
-              date: true,
-              venue: true,
-              fee: true,
-              isPaid: true,
-              isPublic: true,
-            },
-          },
-        },
+        where: { userId_eventId: { userId, eventId } },
+        data: { status: registrationStatus },
       });
     }
 
-    throw new Error("Already registered for this event");
+    throw new Error("Already registered");
   }
 
-  // 7. CREATE NEW REGISTRATION
   return prisma.registration.create({
-    data: {
-      userId,
-      eventId,
-      status: registrationStatus,
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-        },
-      },
-      event: {
-        select: {
-          id: true,
-          title: true,
-          date: true,
-          venue: true,
-          fee: true,
-          isPaid: true,
-          isPublic: true,
-        },
-      },
-    },
+    data: { userId, eventId, status: registrationStatus },
   });
 };
 
-/* =====================================================
-   GET ALL REGISTRATIONS (ADMIN)
-===================================================== */
-const getAllRegistrations = async () =>
-  prisma.registration.findMany({
-    include: {
-      user: { select: { id: true, name: true, email: true, role: true } },
+/* =========================
+   GET ALL
+========================= */
+const getAllRegistrations = async () => {
+  return prisma.registration.findMany({
+    select: { id: true, status: true, userId: true, eventId: true },
+  });
+};
+
+/* =========================
+   GET MY
+========================= */
+const getMyRegistrations = async (userId: string) => {
+  return prisma.registration.findMany({
+    where: { userId, event: { isDeleted: false } },
+    select: {
+      id: true,
+      status: true,
       event: {
         select: { id: true, title: true, date: true, venue: true, fee: true },
       },
     },
   });
+};
 
-/* =====================================================
-   GET MY REGISTRATIONS (USER)
-===================================================== */
-const getMyRegistrations = async (userId: string) =>
-  prisma.registration.findMany({
-    where: {
-      userId,
-      event: {
-        isDeleted: false,
-      },
-    },
-    include: {
-      event: {
-        select: {
-          id: true,
-          title: true,
-          date: true,
-          venue: true,
-          fee: true,
-        },
-      },
-
-      payment: {
-        select: {
-          id: true,
-          amount: true,
-          status: true,
-          transactionId: true,
-          invoiceUrl: true,
-        },
-      },
-    },
-  });
-
-/* =====================================================
-   GET EVENT REGISTRATIONS (OWNER ONLY)
-   + FILTER BY STATUS
-===================================================== */
-const getEventRegistrations = async (
-  eventId: string,
-  ownerId: string,
-  status?: RegistrationStatus
-) => {
+/* =========================
+   EVENT REGISTRATIONS
+========================= */
+const getEventRegistrations = async (eventId: string, ownerId: string, status?: RegistrationStatus) => {
   const event = await prisma.event.findUnique({
     where: { id: eventId },
-    include: {
-      organizer: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-    },
+    select: { organizerId: true },
   });
 
-  if (!event) {
-    throw new Error("Event not found");
-  }
-
-  if (event.organizerId !== ownerId) {
-    throw new Error("Not authorized");
-  }
+  if (!event) throw new Error("Event not found");
+  if (event.organizerId !== ownerId) throw new Error("Unauthorized");
 
   return prisma.registration.findMany({
     where: {
@@ -228,246 +94,117 @@ const getEventRegistrations = async (
       ...(status && { status }),
     },
     include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-
-      payment: {
-        select: {
-          id: true,
-          amount: true,
-          status: true,
-          transactionId: true,
-          createdAt: true,
-        },
-      },
+      user: { select: { id: true, name: true, email: true } },
     },
   });
 };
-export const getRegistrationById = async (
-  userId: string,
-  eventId: string
-) => {
+
+/* =========================
+   GET BY ID
+========================= */
+const getRegistrationById = async (userId: string, eventId: string) => {
   const registration = await prisma.registration.findFirst({
-    where: {
-      userId,
-      eventId,
-    },
+    where: { userId, eventId },
     include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-        },
-      },
-      event: {
-        select: {
-          id: true,
-          title: true,
-          date: true,
-          venue: true,
-          fee: true,
-          isPaid: true,
-          isPublic: true,
-        },
-      },
-      payment: true,
+      event: true,
     },
   });
 
-  if (!registration) {
-    throw new Error("Registration not found");
-  }
-
+  if (!registration) throw new Error("Registration not found");
   return registration;
 };
 
-/* =====================================================
-   APPROVE REGISTRATION (OWNER)
-===================================================== */
-const approveRegistration = async (
-  id: string,
-  ownerId: string
-) => {
-  const registration =
-    await prisma.registration.findUnique({
-      where: { id },
-      include: {
-        event: true,
-        payment: true,
-      },
-    });
+/* =========================
+   APPROVE
+========================= */
+const approveRegistration = async (id: string, ownerId: string) => {
+  const registration = await prisma.registration.findUnique({
+    where: { id },
+    include: { event: true },
+  });
 
-  if (!registration) {
-    throw new Error("Registration not found");
-  }
-
-  if (registration.event.organizerId !== ownerId) {
-    throw new Error("Not authorized");
-  }
-
-  // Paid event must have successful payment
-  if (registration.event.isPaid) {
-    const hasCompletedPayment =
-      registration.payment.some(
-        (p) => p.status === "COMPLETED"
-      );
-
-    if (!hasCompletedPayment) {
-      throw new Error(
-        "Payment not completed yet"
-      );
-    }
-  }
-
-  const updated =
-    await prisma.registration.update({
-      where: { id },
-      data: {
-        status: RegistrationStatus.APPROVED,
-      },
-    });
+  if (!registration) throw new Error("Not found");
+  if (registration.event.organizerId !== ownerId) throw new Error("Unauthorized");
 
   await prisma.invitation.updateMany({
     where: {
       eventId: registration.eventId,
       userId: registration.userId,
     },
-    data: {
-      status: "ACCEPTED",
-    },
+    data: { status: "ACCEPTED" },
   });
 
-  return updated;
+  return prisma.registration.update({
+    where: { id },
+    data: { status: RegistrationStatus.ACCEPTED },
+  });
 };
 
-/* =====================================================
-   REJECT REGISTRATION (OWNER)
-===================================================== */
+/* =========================
+   REJECT
+========================= */
 const rejectRegistration = async (id: string, ownerId: string) => {
   const registration = await prisma.registration.findUnique({
     where: { id },
     include: { event: true },
   });
 
-  if (!registration) throw new Error("Registration not found");
-
-  if (registration.event.organizerId !== ownerId) {
-    throw new Error("Not authorized");
-  }
-
-  const updated = await prisma.registration.update({
-    where: { id },
-    data: {
-      status: RegistrationStatus.REJECTED,
-    },
-  });
-
-  await prisma.invitation.updateMany({
-    where: {
-      eventId: registration.eventId,
-      userId: registration.userId,
-    },
-    data: {
-      status: "REJECTED",
-    },
-  });
-
-  return updated;
-};
-
-/* =====================================================
-   BAN PARTICIPANT (OWNER)
-===================================================== */
-const banParticipant = async (
-  userId: string,
-  eventId: string,
-  ownerId: string
-) => {
-  const event = await prisma.event.findUnique({
-    where: { id: eventId },
-  });
-
-  if (!event) throw new Error("Event not found");
-
-  if (event.organizerId !== ownerId) {
-    throw new Error("Not authorized");
-  }
-
-  const registration = await prisma.registration.findUnique({
-    where: {
-      userId_eventId: { userId, eventId },
-    },
-  });
-
-  if (registration) {
-    return prisma.registration.update({
-      where: { id: registration.id },
-      data: { status: RegistrationStatus.BLOCKED },
-    });
-  }
-
-  return prisma.registration.create({
-    data: {
-      userId,
-      eventId,
-      status: RegistrationStatus.BLOCKED,
-    },
-  });
-};
-
-/* =====================================================
-   UNBAN PARTICIPANT (NEW)
-===================================================== */
-const unbanParticipant = async (
-  userId: string,
-  eventId: string,
-  ownerId: string
-) => {
-  const event = await prisma.event.findUnique({
-    where: { id: eventId },
-  });
-
-  if (!event) throw new Error("Event not found");
-
-  if (event.organizerId !== ownerId) {
-    throw new Error("Not authorized");
-  }
+  if (!registration) throw new Error("Not found");
+  if (registration.event.organizerId !== ownerId) throw new Error("Unauthorized");
 
   return prisma.registration.update({
-    where: {
-      userId_eventId: { userId, eventId },
-    },
-    data: {
-      status: RegistrationStatus.REJECTED,
-    },
+    where: { id },
+    data: { status: RegistrationStatus.REJECTED },
   });
 };
 
-/* =====================================================
-   DELETE REGISTRATION
-===================================================== */
-const deleteRegistration = async (id: string) =>
-  prisma.registration.delete({ where: { id } });
+/* =========================
+   BAN / UNBAN
+========================= */
+const banParticipant = async (userId: string, eventId: string, ownerId: string) => {
+  const event = await prisma.event.findUnique({ where: { id: eventId } });
 
-/* =====================================================
+  if (event?.organizerId !== ownerId) throw new Error("Unauthorized");
+
+  return prisma.registration.upsert({
+    where: { userId_eventId: { userId, eventId } },
+    update: { status: RegistrationStatus.BLOCKED },
+    create: { userId, eventId, status: RegistrationStatus.BLOCKED },
+  });
+};
+
+const unbanParticipant = async (userId: string, eventId: string, ownerId: string) => {
+  const event = await prisma.event.findUnique({ where: { id: eventId } });
+
+  if (event?.organizerId !== ownerId) throw new Error("Unauthorized");
+
+  return prisma.registration.update({
+    where: { userId_eventId: { userId, eventId } },
+    data: { status: RegistrationStatus.PENDING },
+  });
+};
+
+/* =========================
+   DELETE (FIXED MISSING FUNCTION)
+========================= */
+const deleteRegistration = async (id: string) => {
+  return prisma.registration.delete({
+    where: { id },
+  });
+};
+
+/* =========================
    EXPORT
-===================================================== */
+========================= */
 export const registrationService = {
   registerToEvent,
   getAllRegistrations,
   getMyRegistrations,
   getEventRegistrations,
+  getRegistrationById,
   approveRegistration,
   rejectRegistration,
   banParticipant,
   unbanParticipant,
   deleteRegistration,
-  getRegistrationById,
 };

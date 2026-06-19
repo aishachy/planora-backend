@@ -4,24 +4,34 @@ import { invitationController } from "./invitation.controller.js";
 
 const router = express.Router();
 
-// CREATE INVITATION
+/* =========================
+   CREATE INVITATION
+========================= */
 router.post("/", auth("ADMIN", "USER"), invitationController.sendInvitation);
 
-// GET MY INVITATIONS
+/* =========================
+   GET MY INVITATIONS (RECEIVED)
+========================= */
 router.get("/me", auth("ADMIN", "USER"), invitationController.getMyInvitations);
 
-// OPTIONAL ALIAS (FIX YOUR FRONTEND ISSUE)
-router.get(
-  "/sendInvitation",
-  auth("ADMIN", "USER"),
-  invitationController.getSentInvitations
-);
+/* =========================
+   GET SENT INVITATIONS (FIXED NAME)
+========================= */
+router.get("/sent", auth("ADMIN", "USER"), invitationController.getSentInvitations);
 
-// ACCEPT / REJECT
+/* =========================
+   ACCEPT / REJECT
+========================= */
 router.patch("/:id/accept", auth("ADMIN", "USER"), invitationController.acceptInvitation);
 router.patch("/:id/reject", auth("ADMIN", "USER"), invitationController.rejectInvitation);
 
-// PAY
-router.post("/:id/approve-payment", auth("ADMIN", "USER"), invitationController.approvePaymentInvitation);
+/* =========================
+   PAYMENT APPROVAL (KEEP)
+========================= */
+router.post(
+  "/:id/approve-payment",
+  auth("ADMIN", "USER"),
+  invitationController.approvePaymentInvitation
+);
 
 export const invitationRouter = router;

@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
 import { invitationService } from "./invitation.service.js";
-import { prisma } from "../../lib/prisma.js";
 
 // =========================
 // SEND INVITATION
@@ -36,43 +35,23 @@ const sendInvitation = async (req: Request, res: Response) => {
 // =========================
 // GET MY INVITATIONS
 // =========================
-const getMyInvitations = async (userId: string) => {
-  return prisma.invitation.findMany({
-    where: { userId },
+const getMyInvitations = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
 
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-      inviter: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-      event: {
-        select: {
-          id: true,
-          title: true,
-          date: true,
-          venue: true,
-          isPaid: true,
-          fee: true,
-        },
-      },
-    },
+    const data = await invitationService.getMyInvitations(userId);
 
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+    return res.json({
+      success: true,
+      data,
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
 };
-
 // =========================
 // ACCEPT INVITATION (FIXED PARAM)
 // =========================
@@ -167,7 +146,7 @@ const getSentInvitations = async (
     const inviterId = req.user!.id;
 
     const data =
-      await invitationService.getSentInvitations(
+      await invitationService.getMyInvitations(
         inviterId
       );
 
@@ -185,8 +164,8 @@ const getSentInvitations = async (
 
 export const invitationController = {
   sendInvitation,
-  getMyInvitations,
   acceptInvitation,
+  getMyInvitations,
   rejectInvitation,
   approvePaymentInvitation,
   getSentInvitations,
