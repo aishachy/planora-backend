@@ -71,10 +71,9 @@ model Registration {
   eventId String
   event   Event              @relation(fields: [eventId], references: [id])
 
-  payment          Payment[]    @relation(name: "PaymentsToRegistration")
-  registrationDate DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
-  
+  payment          Payment[] @relation(name: "PaymentsToRegistration")
+  registrationDate DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@unique([userId, eventId])
   @@map("registrations")

@@ -62,29 +62,6 @@ const getMyInvitations = async (userId: string) => {
     where: { userId },
 
     include: {
-      registration: {
-        select: {
-          id: true,
-          status: true,
-        },
-      },
-
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-
-      inviter: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-
       event: {
         select: {
           id: true,
@@ -93,6 +70,14 @@ const getMyInvitations = async (userId: string) => {
           venue: true,
           isPaid: true,
           fee: true,
+        },
+      },
+
+      inviter: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
         },
       },
     },
@@ -108,18 +93,9 @@ const getMyInvitations = async (userId: string) => {
 // ========================
 const getSentInvitations = async (inviterId: string) => {
   return prisma.invitation.findMany({
-    where: {
-      inviterId,
-    },
+    where: { inviterId },
 
     include: {
-      registration: {
-        select: {
-          id: true,
-          status: true,
-        },
-      },
-
       user: {
         select: {
           id: true,
@@ -157,10 +133,7 @@ const getSentInvitations = async (inviterId: string) => {
 // ========================
 // ACCEPT FREE EVENT
 // ========================
-const acceptInvitation = async (
-  invitationId: string,
-  userId: string
-) => {
+const acceptInvitation = async (invitationId: string, userId: string) => {
   const invitation = await prisma.invitation.findUnique({
     where: { id: invitationId },
     include: {
@@ -168,13 +141,9 @@ const acceptInvitation = async (
     },
   });
 
-  if (!invitation) {
-    throw new Error("Invitation not found");
-  }
+  if (!invitation) throw new Error("Invitation not found");
 
-  if (invitation.userId !== userId) {
-    throw new Error("Unauthorized");
-  }
+  if (invitation.userId !== userId) throw new Error("Unauthorized");
 
   if (invitation.status !== "PENDING") {
     throw new Error("Invitation already processed");
@@ -185,40 +154,27 @@ const acceptInvitation = async (
   }
 
   await prisma.registration.update({
-    where: {
-      id: invitation.registrationId!,
-    },
-    data: {
-      status: "ACCEPTED",
-    },
+    where: { id: invitation.registrationId! },
+    data: { status: "ACCEPTED" },
   });
 
   return prisma.invitation.update({
     where: { id: invitationId },
-    data: {
-      status: "ACCEPTED",
-    },
+    data: { status: "ACCEPTED" },
   });
 };
 
 // ========================
 // REJECT INVITATION
 // ========================
-const rejectInvitation = async (
-  invitationId: string,
-  userId: string
-) => {
+const rejectInvitation = async (invitationId: string, userId: string) => {
   const invitation = await prisma.invitation.findUnique({
     where: { id: invitationId },
   });
 
-  if (!invitation) {
-    throw new Error("Invitation not found");
-  }
+  if (!invitation) throw new Error("Invitation not found");
 
-  if (invitation.userId !== userId) {
-    throw new Error("Unauthorized");
-  }
+  if (invitation.userId !== userId) throw new Error("Unauthorized");
 
   if (
     invitation.status === "ACCEPTED" ||
@@ -228,24 +184,18 @@ const rejectInvitation = async (
   }
 
   await prisma.registration.update({
-    where: {
-      id: invitation.registrationId!,
-    },
-    data: {
-      status: "REJECTED",
-    },
+    where: { id: invitation.registrationId! },
+    data: { status: "REJECTED" },
   });
 
   return prisma.invitation.update({
     where: { id: invitationId },
-    data: {
-      status: "REJECTED",
-    },
+    data: { status: "REJECTED" },
   });
 };
 
 // ========================
-// ORGANIZER APPROVES PAID REGISTRATION
+// ORGANIZER APPROVES PAYMENT
 // ========================
 const approvePaymentInvitation = async (
   invitationId: string,
@@ -254,7 +204,6 @@ const approvePaymentInvitation = async (
   const invitation = await prisma.invitation.findUnique({
     where: { id: invitationId },
     include: {
-      registration: true,
       event: true,
     },
   });
@@ -267,33 +216,20 @@ const approvePaymentInvitation = async (
     throw new Error("Only organizer can approve");
   }
 
-  if (
-    invitation.registration?.status !== "APPROVAL"
-  ) {
-    throw new Error(
-      "Registration is not waiting for approval"
-    );
-  }
+
 
   await prisma.registration.update({
-    where: {
-      id: invitation.registrationId!,
-    },
-    data: {
-      status: "ACCEPTED",
-    },
+    where: { id: invitation.registrationId! },
+    data: { status: "ACCEPTED" },
   });
 
   return prisma.invitation.update({
-    where: {
-      id: invitationId,
-    },
-    data: {
-      status: "ACCEPTED",
-    },
+    where: { id: invitationId },
+    data: { status: "ACCEPTED" },
   });
 };
 
+// ========================
 export const invitationService = {
   sendInvitation,
   getMyInvitations,
