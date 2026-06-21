@@ -1,5 +1,8 @@
 import { prisma } from "../../app/lib/prisma.js";
-import { InvitationStatus, RegistrationStatus } from "../../generated/prisma/enums.js";
+import {
+  InvitationStatus,
+  RegistrationStatus,
+} from "../../generated/prisma/enums.js";
 
 /* =========================
    SEND INVITATION
@@ -26,36 +29,37 @@ const sendInvitation = async (
 
   if (existing) throw new Error("Already invited");
 
-  const registration = await prisma.registration.create({
-    data: {
-      userId,
-      eventId,
-      status: RegistrationStatus.PENDING,
-    },
-  });
-
   return prisma.invitation.create({
     data: {
       eventId,
       userId,
       inviterId,
       status: InvitationStatus.PENDING,
-      registrationId: registration.id,
     },
   });
 };
 
 /* =========================
-   GET MY INVITATIONS
+   GET MY INVITATIONS (RECEIVED)
 ========================= */
 const getMyInvitations = async (userId: string) => {
   return prisma.invitation.findMany({
     where: { userId },
-    select: {
-      id: true,
-      status: true,
-      createdAt: true,
-      registrationId: true,
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      inviter: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
       event: {
         select: {
           id: true,
@@ -66,82 +70,116 @@ const getMyInvitations = async (userId: string) => {
           fee: true,
         },
       },
-      inviter: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
+      registration: true,
     },
     orderBy: { createdAt: "desc" },
   });
 };
 
 /* =========================
+   GET SENT INVITATIONS
+========================= */
+const getSentInvitations = async (inviterId: string) => {
+  return prisma.invitation.findMany({
+    where: { inviterId },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      event: {
+        select: {
+          id: true,
+          title: true,
+          date: true,
+          venue: true,
+          isPaid: true,
+          fee: true,
+        },
+      },
+      registration: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
+/* =========================
    ACCEPT INVITATION
 ========================= */
-const acceptInvitation = async (invitationId: string, userId: string) => {
+const acceptInvitation = async (
+  invitationId: string,
+  userId: string
+) => {
   const invitation = await prisma.invitation.findUnique({
     where: { id: invitationId },
-    include: {
-      event: true,
-    },
+    include: { event: true },
   });
 
   if (!invitation) throw new Error("Not found");
-  if (invitation.userId !== userId) throw new Error("Unauthorized");
+
+  if (invitation.userId !== userId) {
+    throw new Error("Unauthorized");
+  }
+
   if (invitation.status !== InvitationStatus.PENDING) {
     throw new Error("Already processed");
   }
 
-  if (invitation.event.isPaid) {
-    throw new Error("Payment required");
-  }
-
-  if (!invitation.registrationId) {
-    throw new Error("Registration missing");
-  }
-
-  await prisma.registration.update({
-    where: { id: invitation.registrationId },
-    data: { status: RegistrationStatus.ACCEPTED },
+  /* =========================
+     CREATE REGISTRATION HERE (FIX)
+  ========================= */
+  const registration = await prisma.registration.create({
+    data: {
+      userId: invitation.userId,
+      eventId: invitation.eventId,
+      status: RegistrationStatus.PENDING,
+    },
   });
 
+  /* =========================
+     UPDATE INVITATION
+  ========================= */
   return prisma.invitation.update({
     where: { id: invitationId },
-    data: { status: InvitationStatus.ACCEPTED },
+    data: {
+      status: InvitationStatus.ACCEPTED,
+      registrationId: registration.id,
+    },
   });
 };
 
 /* =========================
    REJECT INVITATION
 ========================= */
-const rejectInvitation = async (invitationId: string, userId: string) => {
+const rejectInvitation = async (
+  invitationId: string,
+  userId: string
+) => {
   const invitation = await prisma.invitation.findUnique({
     where: { id: invitationId },
   });
 
   if (!invitation) throw new Error("Not found");
-  if (invitation.userId !== userId) throw new Error("Unauthorized");
 
-  if (!invitation.registrationId) {
-    throw new Error("Registration missing");
+  if (invitation.userId !== userId) {
+    throw new Error("Unauthorized");
   }
-
-  await prisma.registration.update({
-    where: { id: invitation.registrationId },
-    data: { status: RegistrationStatus.REJECTED },
-  });
 
   return prisma.invitation.update({
     where: { id: invitationId },
-    data: { status: InvitationStatus.REJECTED },
+    data: {
+      status: InvitationStatus.REJECTED,
+    },
   });
 };
 
 /* =========================
-   APPROVE PAYMENT (KEEP SAFE)
+   APPROVE PAYMENT (ORGANIZER)
 ========================= */
 const approvePaymentInvitation = async (
   invitationId: string,
@@ -152,17 +190,26 @@ const approvePaymentInvitation = async (
   });
 
   if (!invitation) throw new Error("Not found");
-  if (invitation.inviterId !== userId) throw new Error("Not authorized");
+
+  if (invitation.inviterId !== userId) {
+    throw new Error("Not authorized");
+  }
 
   return prisma.invitation.update({
     where: { id: invitationId },
-    data: { status: InvitationStatus.ACCEPTED },
+    data: {
+      status: InvitationStatus.ACCEPTED,
+    },
   });
 };
 
+/* =========================
+   EXPORT
+========================= */
 export const invitationService = {
   sendInvitation,
   getMyInvitations,
+  getSentInvitations,
   acceptInvitation,
   rejectInvitation,
   approvePaymentInvitation,

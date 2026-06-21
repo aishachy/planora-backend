@@ -52,7 +52,15 @@ const getAllEvents = async (_req: Request, res: Response) => {
 ========================= */
 const getMyEvents = async (req: Request, res: Response) => {
   try {
+    console.log("USER:", req.user);
     const userId = req.user!.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized - user not found",
+      });
+    }
 
     const result = await eventService.getMyEvents(userId);
 

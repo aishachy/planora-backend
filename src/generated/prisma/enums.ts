@@ -19,9 +19,7 @@ export type Role = (typeof Role)[keyof typeof Role]
 
 export const RegistrationStatus = {
   PENDING: 'PENDING',
-  PAID: 'PAID',
-  APPROVAL: 'APPROVAL',
-  ACCEPTED: 'ACCEPTED',
+  APPROVED: 'APPROVED',
   REJECTED: 'REJECTED',
   BLOCKED: 'BLOCKED'
 } as const
@@ -41,7 +39,9 @@ export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
 export const InvitationStatus = {
   PENDING: 'PENDING',
   ACCEPTED: 'ACCEPTED',
-  REJECTED: 'REJECTED'
+  REJECTED: 'REJECTED',
+  PENDING_PAYMENT: 'PENDING_PAYMENT',
+  PENDING_PAYMENT_APPROVAL: 'PENDING_PAYMENT_APPROVAL'
 } as const
 
 export type InvitationStatus = (typeof InvitationStatus)[keyof typeof InvitationStatus]

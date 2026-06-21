@@ -8,7 +8,6 @@ import { envVars } from "../../app/config/env.js";
 import { catchAsync } from "../../app/shared/catchAsync.js";
 import { sendResponse } from "../../app/shared/sendResponse.js";
 import { stripe } from "../../app/config/stripe.config.js";
-import { v4 as uuidv4 } from "uuid";
 import { prisma } from "../../lib/prisma.js";
 
 // ====================================
@@ -43,7 +42,6 @@ const createCheckoutSession = catchAsync(
       payment = await PaymentService.createPaymentRecord({
         registrationId,
         amount,
-        transactionId: uuidv4(),
       });
     }
 

@@ -44,12 +44,12 @@ export type EventMinAggregateOutputType = {
   isPublic: boolean | null
   isPaid: boolean | null
   fee: number | null
-  isFeatured: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
   isDeleted: boolean | null
   deletedAt: Date | null
   organizerId: string | null
+  isFeatured: boolean | null
 }
 
 export type EventMaxAggregateOutputType = {
@@ -62,12 +62,12 @@ export type EventMaxAggregateOutputType = {
   isPublic: boolean | null
   isPaid: boolean | null
   fee: number | null
-  isFeatured: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
   isDeleted: boolean | null
   deletedAt: Date | null
   organizerId: string | null
+  isFeatured: boolean | null
 }
 
 export type EventCountAggregateOutputType = {
@@ -80,12 +80,12 @@ export type EventCountAggregateOutputType = {
   isPublic: number
   isPaid: number
   fee: number
-  isFeatured: number
   createdAt: number
   updatedAt: number
   isDeleted: number
   deletedAt: number
   organizerId: number
+  isFeatured: number
   _all: number
 }
 
@@ -108,12 +108,12 @@ export type EventMinAggregateInputType = {
   isPublic?: true
   isPaid?: true
   fee?: true
-  isFeatured?: true
   createdAt?: true
   updatedAt?: true
   isDeleted?: true
   deletedAt?: true
   organizerId?: true
+  isFeatured?: true
 }
 
 export type EventMaxAggregateInputType = {
@@ -126,12 +126,12 @@ export type EventMaxAggregateInputType = {
   isPublic?: true
   isPaid?: true
   fee?: true
-  isFeatured?: true
   createdAt?: true
   updatedAt?: true
   isDeleted?: true
   deletedAt?: true
   organizerId?: true
+  isFeatured?: true
 }
 
 export type EventCountAggregateInputType = {
@@ -144,12 +144,12 @@ export type EventCountAggregateInputType = {
   isPublic?: true
   isPaid?: true
   fee?: true
-  isFeatured?: true
   createdAt?: true
   updatedAt?: true
   isDeleted?: true
   deletedAt?: true
   organizerId?: true
+  isFeatured?: true
   _all?: true
 }
 
@@ -249,12 +249,12 @@ export type EventGroupByOutputType = {
   isPublic: boolean
   isPaid: boolean
   fee: number | null
-  isFeatured: boolean
   createdAt: Date
   updatedAt: Date
   isDeleted: boolean
   deletedAt: Date | null
   organizerId: string | null
+  isFeatured: boolean
   _count: EventCountAggregateOutputType | null
   _avg: EventAvgAggregateOutputType | null
   _sum: EventSumAggregateOutputType | null
@@ -290,16 +290,16 @@ export type EventWhereInput = {
   isPublic?: Prisma.BoolFilter<"Event"> | boolean
   isPaid?: Prisma.BoolFilter<"Event"> | boolean
   fee?: Prisma.FloatNullableFilter<"Event"> | number | null
-  isFeatured?: Prisma.BoolFilter<"Event"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   isDeleted?: Prisma.BoolFilter<"Event"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"Event"> | Date | string | null
   organizerId?: Prisma.StringNullableFilter<"Event"> | string | null
+  isFeatured?: Prisma.BoolFilter<"Event"> | boolean
+  invitations?: Prisma.InvitationListRelationFilter
   organizer?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   registrations?: Prisma.RegistrationListRelationFilter
   reviews?: Prisma.ReviewListRelationFilter
-  invitations?: Prisma.InvitationListRelationFilter
 }
 
 export type EventOrderByWithRelationInput = {
@@ -312,16 +312,16 @@ export type EventOrderByWithRelationInput = {
   isPublic?: Prisma.SortOrder
   isPaid?: Prisma.SortOrder
   fee?: Prisma.SortOrderInput | Prisma.SortOrder
-  isFeatured?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   organizerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  isFeatured?: Prisma.SortOrder
+  invitations?: Prisma.InvitationOrderByRelationAggregateInput
   organizer?: Prisma.UserOrderByWithRelationInput
   registrations?: Prisma.RegistrationOrderByRelationAggregateInput
   reviews?: Prisma.ReviewOrderByRelationAggregateInput
-  invitations?: Prisma.InvitationOrderByRelationAggregateInput
 }
 
 export type EventWhereUniqueInput = Prisma.AtLeast<{
@@ -337,16 +337,16 @@ export type EventWhereUniqueInput = Prisma.AtLeast<{
   isPublic?: Prisma.BoolFilter<"Event"> | boolean
   isPaid?: Prisma.BoolFilter<"Event"> | boolean
   fee?: Prisma.FloatNullableFilter<"Event"> | number | null
-  isFeatured?: Prisma.BoolFilter<"Event"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   isDeleted?: Prisma.BoolFilter<"Event"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"Event"> | Date | string | null
   organizerId?: Prisma.StringNullableFilter<"Event"> | string | null
+  isFeatured?: Prisma.BoolFilter<"Event"> | boolean
+  invitations?: Prisma.InvitationListRelationFilter
   organizer?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   registrations?: Prisma.RegistrationListRelationFilter
   reviews?: Prisma.ReviewListRelationFilter
-  invitations?: Prisma.InvitationListRelationFilter
 }, "id">
 
 export type EventOrderByWithAggregationInput = {
@@ -359,12 +359,12 @@ export type EventOrderByWithAggregationInput = {
   isPublic?: Prisma.SortOrder
   isPaid?: Prisma.SortOrder
   fee?: Prisma.SortOrderInput | Prisma.SortOrder
-  isFeatured?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   organizerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  isFeatured?: Prisma.SortOrder
   _count?: Prisma.EventCountOrderByAggregateInput
   _avg?: Prisma.EventAvgOrderByAggregateInput
   _max?: Prisma.EventMaxOrderByAggregateInput
@@ -385,12 +385,12 @@ export type EventScalarWhereWithAggregatesInput = {
   isPublic?: Prisma.BoolWithAggregatesFilter<"Event"> | boolean
   isPaid?: Prisma.BoolWithAggregatesFilter<"Event"> | boolean
   fee?: Prisma.FloatNullableWithAggregatesFilter<"Event"> | number | null
-  isFeatured?: Prisma.BoolWithAggregatesFilter<"Event"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
   isDeleted?: Prisma.BoolWithAggregatesFilter<"Event"> | boolean
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Event"> | Date | string | null
   organizerId?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
+  isFeatured?: Prisma.BoolWithAggregatesFilter<"Event"> | boolean
 }
 
 export type EventCreateInput = {
@@ -403,15 +403,15 @@ export type EventCreateInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
-  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isFeatured?: boolean
+  invitations?: Prisma.InvitationCreateNestedManyWithoutEventInput
   organizer?: Prisma.UserCreateNestedOneWithoutEventsInput
   registrations?: Prisma.RegistrationCreateNestedManyWithoutEventInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutEventInput
-  invitations?: Prisma.InvitationCreateNestedManyWithoutEventInput
 }
 
 export type EventUncheckedCreateInput = {
@@ -424,15 +424,15 @@ export type EventUncheckedCreateInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
-  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
   organizerId?: string | null
+  isFeatured?: boolean
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutEventInput
   registrations?: Prisma.RegistrationUncheckedCreateNestedManyWithoutEventInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutEventInput
-  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutEventInput
 }
 
 export type EventUpdateInput = {
@@ -445,15 +445,15 @@ export type EventUpdateInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  invitations?: Prisma.InvitationUpdateManyWithoutEventNestedInput
   organizer?: Prisma.UserUpdateOneWithoutEventsNestedInput
   registrations?: Prisma.RegistrationUpdateManyWithoutEventNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutEventNestedInput
-  invitations?: Prisma.InvitationUpdateManyWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateInput = {
@@ -466,15 +466,15 @@ export type EventUncheckedUpdateInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organizerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutEventNestedInput
   registrations?: Prisma.RegistrationUncheckedUpdateManyWithoutEventNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutEventNestedInput
-  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutEventNestedInput
 }
 
 export type EventCreateManyInput = {
@@ -487,12 +487,12 @@ export type EventCreateManyInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
-  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
   organizerId?: string | null
+  isFeatured?: boolean
 }
 
 export type EventUpdateManyMutationInput = {
@@ -505,11 +505,11 @@ export type EventUpdateManyMutationInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type EventUncheckedUpdateManyInput = {
@@ -522,12 +522,12 @@ export type EventUncheckedUpdateManyInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organizerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type EventListRelationFilter = {
@@ -550,12 +550,12 @@ export type EventCountOrderByAggregateInput = {
   isPublic?: Prisma.SortOrder
   isPaid?: Prisma.SortOrder
   fee?: Prisma.SortOrder
-  isFeatured?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   organizerId?: Prisma.SortOrder
+  isFeatured?: Prisma.SortOrder
 }
 
 export type EventAvgOrderByAggregateInput = {
@@ -572,12 +572,12 @@ export type EventMaxOrderByAggregateInput = {
   isPublic?: Prisma.SortOrder
   isPaid?: Prisma.SortOrder
   fee?: Prisma.SortOrder
-  isFeatured?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   organizerId?: Prisma.SortOrder
+  isFeatured?: Prisma.SortOrder
 }
 
 export type EventMinOrderByAggregateInput = {
@@ -590,12 +590,12 @@ export type EventMinOrderByAggregateInput = {
   isPublic?: Prisma.SortOrder
   isPaid?: Prisma.SortOrder
   fee?: Prisma.SortOrder
-  isFeatured?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   organizerId?: Prisma.SortOrder
+  isFeatured?: Prisma.SortOrder
 }
 
 export type EventSumOrderByAggregateInput = {
@@ -713,14 +713,14 @@ export type EventCreateWithoutOrganizerInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
-  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isFeatured?: boolean
+  invitations?: Prisma.InvitationCreateNestedManyWithoutEventInput
   registrations?: Prisma.RegistrationCreateNestedManyWithoutEventInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutEventInput
-  invitations?: Prisma.InvitationCreateNestedManyWithoutEventInput
 }
 
 export type EventUncheckedCreateWithoutOrganizerInput = {
@@ -733,14 +733,14 @@ export type EventUncheckedCreateWithoutOrganizerInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
-  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isFeatured?: boolean
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutEventInput
   registrations?: Prisma.RegistrationUncheckedCreateNestedManyWithoutEventInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutEventInput
-  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutEventInput
 }
 
 export type EventCreateOrConnectWithoutOrganizerInput = {
@@ -782,12 +782,12 @@ export type EventScalarWhereInput = {
   isPublic?: Prisma.BoolFilter<"Event"> | boolean
   isPaid?: Prisma.BoolFilter<"Event"> | boolean
   fee?: Prisma.FloatNullableFilter<"Event"> | number | null
-  isFeatured?: Prisma.BoolFilter<"Event"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   isDeleted?: Prisma.BoolFilter<"Event"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"Event"> | Date | string | null
   organizerId?: Prisma.StringNullableFilter<"Event"> | string | null
+  isFeatured?: Prisma.BoolFilter<"Event"> | boolean
 }
 
 export type EventCreateWithoutRegistrationsInput = {
@@ -800,14 +800,14 @@ export type EventCreateWithoutRegistrationsInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
-  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isFeatured?: boolean
+  invitations?: Prisma.InvitationCreateNestedManyWithoutEventInput
   organizer?: Prisma.UserCreateNestedOneWithoutEventsInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutEventInput
-  invitations?: Prisma.InvitationCreateNestedManyWithoutEventInput
 }
 
 export type EventUncheckedCreateWithoutRegistrationsInput = {
@@ -820,14 +820,14 @@ export type EventUncheckedCreateWithoutRegistrationsInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
-  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
   organizerId?: string | null
-  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutEventInput
+  isFeatured?: boolean
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutEventInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutEventInput
 }
 
 export type EventCreateOrConnectWithoutRegistrationsInput = {
@@ -856,14 +856,14 @@ export type EventUpdateWithoutRegistrationsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  invitations?: Prisma.InvitationUpdateManyWithoutEventNestedInput
   organizer?: Prisma.UserUpdateOneWithoutEventsNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutEventNestedInput
-  invitations?: Prisma.InvitationUpdateManyWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateWithoutRegistrationsInput = {
@@ -876,14 +876,14 @@ export type EventUncheckedUpdateWithoutRegistrationsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organizerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutEventNestedInput
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutEventNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutEventNestedInput
 }
 
 export type EventCreateWithoutReviewsInput = {
@@ -896,14 +896,14 @@ export type EventCreateWithoutReviewsInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
-  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isFeatured?: boolean
+  invitations?: Prisma.InvitationCreateNestedManyWithoutEventInput
   organizer?: Prisma.UserCreateNestedOneWithoutEventsInput
   registrations?: Prisma.RegistrationCreateNestedManyWithoutEventInput
-  invitations?: Prisma.InvitationCreateNestedManyWithoutEventInput
 }
 
 export type EventUncheckedCreateWithoutReviewsInput = {
@@ -916,14 +916,14 @@ export type EventUncheckedCreateWithoutReviewsInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
-  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
   organizerId?: string | null
-  registrations?: Prisma.RegistrationUncheckedCreateNestedManyWithoutEventInput
+  isFeatured?: boolean
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutEventInput
+  registrations?: Prisma.RegistrationUncheckedCreateNestedManyWithoutEventInput
 }
 
 export type EventCreateOrConnectWithoutReviewsInput = {
@@ -952,14 +952,14 @@ export type EventUpdateWithoutReviewsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  invitations?: Prisma.InvitationUpdateManyWithoutEventNestedInput
   organizer?: Prisma.UserUpdateOneWithoutEventsNestedInput
   registrations?: Prisma.RegistrationUpdateManyWithoutEventNestedInput
-  invitations?: Prisma.InvitationUpdateManyWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateWithoutReviewsInput = {
@@ -972,14 +972,14 @@ export type EventUncheckedUpdateWithoutReviewsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organizerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  registrations?: Prisma.RegistrationUncheckedUpdateManyWithoutEventNestedInput
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutEventNestedInput
+  registrations?: Prisma.RegistrationUncheckedUpdateManyWithoutEventNestedInput
 }
 
 export type EventCreateWithoutInvitationsInput = {
@@ -992,11 +992,11 @@ export type EventCreateWithoutInvitationsInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
-  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isFeatured?: boolean
   organizer?: Prisma.UserCreateNestedOneWithoutEventsInput
   registrations?: Prisma.RegistrationCreateNestedManyWithoutEventInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutEventInput
@@ -1012,12 +1012,12 @@ export type EventUncheckedCreateWithoutInvitationsInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
-  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
   organizerId?: string | null
+  isFeatured?: boolean
   registrations?: Prisma.RegistrationUncheckedCreateNestedManyWithoutEventInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutEventInput
 }
@@ -1048,11 +1048,11 @@ export type EventUpdateWithoutInvitationsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   organizer?: Prisma.UserUpdateOneWithoutEventsNestedInput
   registrations?: Prisma.RegistrationUpdateManyWithoutEventNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutEventNestedInput
@@ -1068,12 +1068,12 @@ export type EventUncheckedUpdateWithoutInvitationsInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   organizerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   registrations?: Prisma.RegistrationUncheckedUpdateManyWithoutEventNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutEventNestedInput
 }
@@ -1088,11 +1088,11 @@ export type EventCreateManyOrganizerInput = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: number | null
-  isFeatured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   isDeleted?: boolean
   deletedAt?: Date | string | null
+  isFeatured?: boolean
 }
 
 export type EventUpdateWithoutOrganizerInput = {
@@ -1105,14 +1105,14 @@ export type EventUpdateWithoutOrganizerInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  invitations?: Prisma.InvitationUpdateManyWithoutEventNestedInput
   registrations?: Prisma.RegistrationUpdateManyWithoutEventNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutEventNestedInput
-  invitations?: Prisma.InvitationUpdateManyWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateWithoutOrganizerInput = {
@@ -1125,14 +1125,14 @@ export type EventUncheckedUpdateWithoutOrganizerInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutEventNestedInput
   registrations?: Prisma.RegistrationUncheckedUpdateManyWithoutEventNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutEventNestedInput
-  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateManyWithoutOrganizerInput = {
@@ -1145,11 +1145,11 @@ export type EventUncheckedUpdateManyWithoutOrganizerInput = {
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   fee?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -1158,15 +1158,15 @@ export type EventUncheckedUpdateManyWithoutOrganizerInput = {
  */
 
 export type EventCountOutputType = {
+  invitations: number
   registrations: number
   reviews: number
-  invitations: number
 }
 
 export type EventCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  invitations?: boolean | EventCountOutputTypeCountInvitationsArgs
   registrations?: boolean | EventCountOutputTypeCountRegistrationsArgs
   reviews?: boolean | EventCountOutputTypeCountReviewsArgs
-  invitations?: boolean | EventCountOutputTypeCountInvitationsArgs
 }
 
 /**
@@ -1177,6 +1177,13 @@ export type EventCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extens
    * Select specific fields to fetch from the EventCountOutputType
    */
   select?: Prisma.EventCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * EventCountOutputType without action
+ */
+export type EventCountOutputTypeCountInvitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InvitationWhereInput
 }
 
 /**
@@ -1193,13 +1200,6 @@ export type EventCountOutputTypeCountReviewsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.ReviewWhereInput
 }
 
-/**
- * EventCountOutputType without action
- */
-export type EventCountOutputTypeCountInvitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.InvitationWhereInput
-}
-
 
 export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1211,16 +1211,16 @@ export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   isPublic?: boolean
   isPaid?: boolean
   fee?: boolean
-  isFeatured?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   isDeleted?: boolean
   deletedAt?: boolean
   organizerId?: boolean
+  isFeatured?: boolean
+  invitations?: boolean | Prisma.Event$invitationsArgs<ExtArgs>
   organizer?: boolean | Prisma.Event$organizerArgs<ExtArgs>
   registrations?: boolean | Prisma.Event$registrationsArgs<ExtArgs>
   reviews?: boolean | Prisma.Event$reviewsArgs<ExtArgs>
-  invitations?: boolean | Prisma.Event$invitationsArgs<ExtArgs>
   _count?: boolean | Prisma.EventCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["event"]>
 
@@ -1234,12 +1234,12 @@ export type EventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   isPublic?: boolean
   isPaid?: boolean
   fee?: boolean
-  isFeatured?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   isDeleted?: boolean
   deletedAt?: boolean
   organizerId?: boolean
+  isFeatured?: boolean
   organizer?: boolean | Prisma.Event$organizerArgs<ExtArgs>
 }, ExtArgs["result"]["event"]>
 
@@ -1253,12 +1253,12 @@ export type EventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   isPublic?: boolean
   isPaid?: boolean
   fee?: boolean
-  isFeatured?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   isDeleted?: boolean
   deletedAt?: boolean
   organizerId?: boolean
+  isFeatured?: boolean
   organizer?: boolean | Prisma.Event$organizerArgs<ExtArgs>
 }, ExtArgs["result"]["event"]>
 
@@ -1272,20 +1272,20 @@ export type EventSelectScalar = {
   isPublic?: boolean
   isPaid?: boolean
   fee?: boolean
-  isFeatured?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   isDeleted?: boolean
   deletedAt?: boolean
   organizerId?: boolean
+  isFeatured?: boolean
 }
 
-export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "date" | "time" | "venue" | "isPublic" | "isPaid" | "fee" | "isFeatured" | "createdAt" | "updatedAt" | "isDeleted" | "deletedAt" | "organizerId", ExtArgs["result"]["event"]>
+export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "date" | "time" | "venue" | "isPublic" | "isPaid" | "fee" | "createdAt" | "updatedAt" | "isDeleted" | "deletedAt" | "organizerId" | "isFeatured", ExtArgs["result"]["event"]>
 export type EventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  invitations?: boolean | Prisma.Event$invitationsArgs<ExtArgs>
   organizer?: boolean | Prisma.Event$organizerArgs<ExtArgs>
   registrations?: boolean | Prisma.Event$registrationsArgs<ExtArgs>
   reviews?: boolean | Prisma.Event$reviewsArgs<ExtArgs>
-  invitations?: boolean | Prisma.Event$invitationsArgs<ExtArgs>
   _count?: boolean | Prisma.EventCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type EventIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1298,10 +1298,10 @@ export type EventIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type $EventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Event"
   objects: {
+    invitations: Prisma.$InvitationPayload<ExtArgs>[]
     organizer: Prisma.$UserPayload<ExtArgs> | null
     registrations: Prisma.$RegistrationPayload<ExtArgs>[]
     reviews: Prisma.$ReviewPayload<ExtArgs>[]
-    invitations: Prisma.$InvitationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1313,12 +1313,12 @@ export type $EventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     isPublic: boolean
     isPaid: boolean
     fee: number | null
-    isFeatured: boolean
     createdAt: Date
     updatedAt: Date
     isDeleted: boolean
     deletedAt: Date | null
     organizerId: string | null
+    isFeatured: boolean
   }, ExtArgs["result"]["event"]>
   composites: {}
 }
@@ -1713,10 +1713,10 @@ readonly fields: EventFieldRefs;
  */
 export interface Prisma__EventClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  invitations<T extends Prisma.Event$invitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Event$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   organizer<T extends Prisma.Event$organizerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Event$organizerArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   registrations<T extends Prisma.Event$registrationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Event$registrationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RegistrationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviews<T extends Prisma.Event$reviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Event$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  invitations<T extends Prisma.Event$invitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Event$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1755,12 +1755,12 @@ export interface EventFieldRefs {
   readonly isPublic: Prisma.FieldRef<"Event", 'Boolean'>
   readonly isPaid: Prisma.FieldRef<"Event", 'Boolean'>
   readonly fee: Prisma.FieldRef<"Event", 'Float'>
-  readonly isFeatured: Prisma.FieldRef<"Event", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Event", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Event", 'DateTime'>
   readonly isDeleted: Prisma.FieldRef<"Event", 'Boolean'>
   readonly deletedAt: Prisma.FieldRef<"Event", 'DateTime'>
   readonly organizerId: Prisma.FieldRef<"Event", 'String'>
+  readonly isFeatured: Prisma.FieldRef<"Event", 'Boolean'>
 }
     
 
@@ -2162,6 +2162,30 @@ export type EventDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
+ * Event.invitations
+ */
+export type Event$invitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Invitation
+   */
+  select?: Prisma.InvitationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Invitation
+   */
+  omit?: Prisma.InvitationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InvitationInclude<ExtArgs> | null
+  where?: Prisma.InvitationWhereInput
+  orderBy?: Prisma.InvitationOrderByWithRelationInput | Prisma.InvitationOrderByWithRelationInput[]
+  cursor?: Prisma.InvitationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InvitationScalarFieldEnum | Prisma.InvitationScalarFieldEnum[]
+}
+
+/**
  * Event.organizer
  */
 export type Event$organizerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2226,30 +2250,6 @@ export type Event$reviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.ReviewScalarFieldEnum | Prisma.ReviewScalarFieldEnum[]
-}
-
-/**
- * Event.invitations
- */
-export type Event$invitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Invitation
-   */
-  select?: Prisma.InvitationSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Invitation
-   */
-  omit?: Prisma.InvitationOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.InvitationInclude<ExtArgs> | null
-  where?: Prisma.InvitationWhereInput
-  orderBy?: Prisma.InvitationOrderByWithRelationInput | Prisma.InvitationOrderByWithRelationInput[]
-  cursor?: Prisma.InvitationWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.InvitationScalarFieldEnum | Prisma.InvitationScalarFieldEnum[]
 }
 
 /**

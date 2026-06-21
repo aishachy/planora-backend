@@ -28,7 +28,7 @@ const registerToEvent = async (userId: string, eventId: string, status?: Registr
   const registrationStatus =
     status ??
     (event.isPublic && !event.isPaid
-      ? RegistrationStatus.ACCEPTED
+      ? RegistrationStatus.APPROVED
       : RegistrationStatus.PENDING);
 
   if (existing) {
@@ -65,12 +65,20 @@ const getAllRegistrations = async () => {
 ========================= */
 const getMyRegistrations = async (userId: string) => {
   return prisma.registration.findMany({
-    where: { userId, event: { isDeleted: false } },
-    select: {
-      id: true,
-      status: true,
+    where: {
+      userId,
+      event: { isDeleted: false },
+    },
+    include: {
+      payment: true, 
       event: {
-        select: { id: true, title: true, date: true, venue: true, fee: true },
+        select: {
+          id: true,
+          title: true,
+          date: true,
+          venue: true,
+          fee: true,
+        },
       },
     },
   });
@@ -136,7 +144,7 @@ const approveRegistration = async (id: string, ownerId: string) => {
 
   return prisma.registration.update({
     where: { id },
-    data: { status: RegistrationStatus.ACCEPTED },
+    data: { status: RegistrationStatus.APPROVED },
   });
 };
 

@@ -10,4 +10,6 @@ router.post('/register', authController.registerUser)
 
 router.get('/me', auth(), authController.currentUser)
 
+router.post("/logout", authController.logout);
+
 export const authRouter = router;

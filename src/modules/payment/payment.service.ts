@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import Stripe from "stripe";
 import { prisma } from "../../lib/prisma.js";
-import {
-  PaymentStatus,
-  RegistrationStatus,
-} from "../../generated/prisma/enums.js";
+import { PaymentStatus, RegistrationStatus } from "../../generated/prisma/enums.js";
 import { uploadFileToCloudinary } from "../../app/config/cloudinary.config.js";
 import { sendEmail } from "../../utils/email.js";
 import { generateInvoicePdf } from "../../utils/payment.js";
@@ -14,21 +12,26 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export const PaymentService = {
+  // =========================
+  // CREATE PAYMENT RECORD
+  // =========================
   createPaymentRecord: async (data: {
     registrationId: string;
     amount: number;
-    transactionId: string;
   }) => {
     return prisma.payment.create({
       data: {
         registrationId: data.registrationId,
         amount: data.amount,
         status: PaymentStatus.PENDING,
-        transactionId: data.transactionId,
+        transactionId: crypto.randomUUID(),
       },
     });
   },
 
+  // =========================
+  // CREATE STRIPE SESSION
+  // =========================
   createStripeCheckoutSession: async (
     payment: any,
     registrationId: string,
@@ -37,6 +40,7 @@ export const PaymentService = {
     return stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
+
       line_items: [
         {
           price_data: {
@@ -44,7 +48,7 @@ export const PaymentService = {
             product_data: {
               name: "Event Ticket",
             },
-            unit_amount: amount * 100,
+            unit_amount: Math.round(amount * 100),
           },
           quantity: 1,
         },
@@ -55,27 +59,20 @@ export const PaymentService = {
         paymentId: payment.id,
       },
 
-      success_url: `${process.env.FRONTEND_URL}/payment/success`,
+      success_url: `${process.env.FRONTEND_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.FRONTEND_URL}/payment/cancel`,
     });
   },
 
+  // =========================
+  // STRIPE WEBHOOK HANDLER
+  // =========================
   handlerStripeWebhookEvent: async (event: Stripe.Event) => {
     console.log("🔥 WEBHOOK RECEIVED:", event.type);
 
     try {
-      const existing = await prisma.payment.findFirst({
-        where: { stripeEventId: event.id },
-      });
-
-      if (existing) {
-        console.log("Duplicate webhook ignored");
-        return;
-      }
-
-      if (event.type !== "checkout.session.completed") {
-        return;
-      }
+      // Only handle successful checkout
+      if (event.type !== "checkout.session.completed") return;
 
       const session = event.data.object as Stripe.Checkout.Session;
 
@@ -83,10 +80,11 @@ export const PaymentService = {
       const paymentId = session.metadata?.paymentId;
 
       if (!registrationId || !paymentId) {
-        console.log("Missing metadata");
+        console.log("❌ Missing metadata");
         return;
       }
 
+      // Fetch registration
       const registration = await prisma.registration.findUnique({
         where: { id: registrationId },
         include: {
@@ -96,42 +94,45 @@ export const PaymentService = {
       });
 
       if (!registration) {
-        console.log("Registration not found");
+        console.log("❌ Registration not found");
         return;
       }
 
       const isPaid =
         session.payment_status === "paid" ||
-        session.status === "complete";
-
+        session.status === "complete" ||
+        session.payment_intent !== null;
+      console.log("SESSION:", session);
+      console.log("PAYMENT INTENT:", session.payment_intent);
       // =========================
-      // STEP 1: UPDATE PAYMENT
+      // UPDATE PAYMENT
       // =========================
+      console.log("Updating payment:", paymentId);
       const updatedPayment = await prisma.payment.update({
         where: { id: paymentId },
         data: {
-          status: isPaid
-            ? PaymentStatus.COMPLETED
-            : PaymentStatus.FAILED,
+          status: PaymentStatus.COMPLETED,
           stripeEventId: event.id,
           paymentGatewayData: session as any,
+          
         },
       });
+      console.log("Payment updated:", updatedPayment.id);
 
       if (!isPaid) return;
 
       // =========================
-      // STEP 2: UPDATE REGISTRATION
+      // UPDATE REGISTRATION
       // =========================
       await prisma.registration.update({
         where: { id: registrationId },
         data: {
-          status: RegistrationStatus.ACCEPTED,
+          status: RegistrationStatus.APPROVED,
         },
       });
 
       // =========================
-      // STEP 4: HEAVY TASKS
+      // GENERATE INVOICE PDF
       // =========================
       try {
         const pdfBuffer = await generateInvoicePdf({
@@ -149,6 +150,7 @@ export const PaymentService = {
           `invoices/invoice-${paymentId}.pdf`
         );
 
+        // Save invoice URL
         await prisma.payment.update({
           where: { id: paymentId },
           data: {
@@ -156,6 +158,9 @@ export const PaymentService = {
           },
         });
 
+        // =========================
+        // SEND EMAIL WITH INVOICE
+        // =========================
         await sendEmail({
           to: registration.user.email,
           subject: `Payment Confirmation - ${registration.event.title}`,
@@ -177,12 +182,12 @@ export const PaymentService = {
           ],
         });
       } catch (err) {
-        console.error("Invoice/Email error:", err);
+        console.error("❌ Invoice/Email error:", err);
       }
 
-      console.log("✅ Payment processed successfully");
+      console.log("✅ Payment completed successfully");
     } catch (error) {
-      console.error("Webhook handler error:", error);
+      console.error("❌ Webhook error:", error);
     }
   },
 };

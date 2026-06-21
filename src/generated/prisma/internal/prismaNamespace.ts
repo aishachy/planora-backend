@@ -902,8 +902,8 @@ export const UserScalarFieldEnum = {
   updatedAt: 'updatedAt',
   isDeleted: 'isDeleted',
   deletedAt: 'deletedAt',
-  isBanned: 'isBanned',
-  bannedAt: 'bannedAt'
+  bannedAt: 'bannedAt',
+  isBanned: 'isBanned'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -919,12 +919,12 @@ export const EventScalarFieldEnum = {
   isPublic: 'isPublic',
   isPaid: 'isPaid',
   fee: 'fee',
-  isFeatured: 'isFeatured',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   isDeleted: 'isDeleted',
   deletedAt: 'deletedAt',
-  organizerId: 'organizerId'
+  organizerId: 'organizerId',
+  isFeatured: 'isFeatured'
 } as const
 
 export type EventScalarFieldEnum = (typeof EventScalarFieldEnum)[keyof typeof EventScalarFieldEnum]
@@ -945,13 +945,13 @@ export type RegistrationScalarFieldEnum = (typeof RegistrationScalarFieldEnum)[k
 export const PaymentScalarFieldEnum = {
   id: 'id',
   amount: 'amount',
-  transactionId: 'transactionId',
-  stripeEventId: 'stripeEventId',
   status: 'status',
-  paymentGatewayData: 'paymentGatewayData',
-  invoiceUrl: 'invoiceUrl',
   createdAt: 'createdAt',
-  registrationId: 'registrationId'
+  registrationId: 'registrationId',
+  stripeEventId: 'stripeEventId',
+  paymentGatewayData: 'paymentGatewayData',
+  transactionId: 'transactionId',
+  invoiceUrl: 'invoiceUrl'
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
@@ -974,11 +974,11 @@ export const InvitationScalarFieldEnum = {
   id: 'id',
   eventId: 'eventId',
   userId: 'userId',
-  inviterId: 'inviterId',
-  registrationId: 'registrationId',
   status: 'status',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  inviterId: 'inviterId',
+  registrationId: 'registrationId'
 } as const
 
 export type InvitationScalarFieldEnum = (typeof InvitationScalarFieldEnum)[keyof typeof InvitationScalarFieldEnum]

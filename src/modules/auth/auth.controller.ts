@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { authService } from "./auth.service.js";
+import { catchAsync } from "../../app/shared/catchAsync.js";
+import { sendResponse } from "../../app/shared/sendResponse.js";
 
 const loginUser = async (req: Request, res: Response) => {
   try {
@@ -76,8 +78,26 @@ const currentUser = async (req: Request, res: Response) => {
   }
 };
 
+// auth.controller.ts
+
+const logout = catchAsync(async (req, res) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+
+  sendResponse(res, {
+    httpStatusCode: 200,
+    success: true,
+    message: "Logged out successfully",
+    data: null,
+  });
+});
+
 export const authController = {
   loginUser,
   registerUser,
   currentUser,
+  logout,
 };
